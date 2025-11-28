@@ -128,7 +128,7 @@ def render_jobs_overview(
                 .interactive()
             )
 
-            left_col.altair_chart(chart, use_container_width=True)
+            left_col.altair_chart(chart, width="stretch")
 
         # ---------- Process distribution pie ----------
         if "processID" in display_df.columns:
@@ -162,7 +162,7 @@ def render_jobs_overview(
                     ],
                 )
             )
-            right_col.altair_chart(pie, use_container_width=True)
+            right_col.altair_chart(pie, width="stretch")
 
             # ---------- Submitter distribution ----------
             if "submitter" in display_df.columns:
@@ -193,7 +193,7 @@ def render_jobs_overview(
                         ],
                     )
                 )
-                right_col.altair_chart(sub_bar, use_container_width=True)
+                right_col.altair_chart(sub_bar, width="stretch")
             else:
                 right_col.info("No submitter data to show distribution.")
         else:

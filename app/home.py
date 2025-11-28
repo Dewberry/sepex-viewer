@@ -197,7 +197,7 @@ with col3:
                         try:
                             st.dataframe(
                                 pd.DataFrame(results),
-                                use_container_width=True,
+                                width="stretch",
                             )
                         except Exception:
                             st.json(results)

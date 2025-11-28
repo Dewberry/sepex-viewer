@@ -17,6 +17,23 @@ services:
       postgres:
         condition: service_healthy
 
+  viewer:
+    container_name: sepex-viewer
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - '8501:8501'         
+    volumes:
+      - .:/app                # for local builds and code changes
+    networks:
+      - process_api_net
+    depends_on:
+      sepex:
+        condition: service_started
+
   minio:
     container_name: minio
     image: quay.io/minio/minio

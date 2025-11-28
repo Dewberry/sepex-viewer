@@ -41,15 +41,15 @@ class SepexAPI:
         import yaml
 
         url = f"{self.base_url}/{endpoint}"
-        print(f"Fetching processes from {url}")
+        # print(f"Fetching processes from {url}")
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
-            print("data:", data)
+            # print("data:", data)
             # Expecting dict with 'processes' key
             processes = data.get("processes", [])
             process_ids = [p["id"] for p in processes]
-            print(f"Fetched processes: {process_ids}")
+            # print(f"Fetched processes: {process_ids}")
             yamls = yaml.dump([Process(**p).model_dump() for p in processes], sort_keys=False)
             return process_ids, yamls
         else:
@@ -58,7 +58,7 @@ class SepexAPI:
 
     def fetch_processes_dict(self, endpoint: str = "processes") -> dict:
         url = f"{self.base_url}/{endpoint}"
-        print(f"Fetching processes from {url}")
+        # print(f"Fetching processes from {url}")
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
