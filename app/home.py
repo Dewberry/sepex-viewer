@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 import streamlit as st
 import yaml
+from helpers import render_jobs_overview
 from pydantic import ValidationError
 from sepex import (
     Job,
@@ -21,6 +22,16 @@ api = SepexAPI()
 # ---------- Session state ----------
 if "selected_job_id" not in st.session_state:
     st.session_state.selected_job_id = None
+
+# ---------- Fetch all jobs once for overview ----------
+raw_all = api.fetch_table("jobs", Job, params={"limit": 500, "offset": 0})
+df_all = raw_all if isinstance(raw_all, pd.DataFrame) else pd.DataFrame()
+
+# ---------- TOP: Jobs overview (KPIs + plots) ----------
+st.subheader("Jobs overview")
+render_jobs_overview(df_all.to_dict(orient="records"), api=api)
+
+st.markdown("---")
 
 # ---------- Fetch processes ----------
 processes_dict = api.fetch_processes_dict()
@@ -44,19 +55,17 @@ with col1:
         st.write("**Version:**", info["version"])
         st.write("**Job Control Options:**", info["jobControlOptions"])
 
-        st.markdown("**Selected Process as YAML:**")
-        st.code(yaml.dump(info, sort_keys=False), language="yaml")
+        # to show YAML here:
+        # st.markdown("**Selected Process as YAML:**")
+        # st.code(yaml.dump(info, sort_keys=False), language="yaml")
 
 # ---------- MIDDLE: Jobs table ----------
 with col2:
     st.subheader("Jobs")
 
-    # Pagination controls
-    # limit = st.number_input("Records per page:", min_value=1, max_value=200, value=50)
+    # For the jobs table we can fetch per-process (or reuse df_all if you prefer)
     limit = 1000
-    # offset = st.number_input("Offset:", min_value=0, value=0)
     params = {"limit": limit, "processID": selected_process_id}
-    # params = {"limit": limit, "offset": offset, "processID": selected_process_id}
     df = api.fetch_table("jobs", Job, params=params)
 
     if df is None or df.empty:
