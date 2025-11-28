@@ -1,0 +1,54 @@
+services:
+  sepex:
+    container_name: sepex
+    image: ghcr.io/dewberry/sepex/api:dev-2025.11.0-beta
+    ports:
+      - '5050:5050'
+    env_file:
+      - .env
+    volumes:
+      - ./.data/api:/.data
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - process_api_net
+    depends_on:
+      minio:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+
+  minio:
+    container_name: minio
+    image: quay.io/minio/minio
+    entrypoint: ["/bin/sh", "/minio-entrypoint.sh"]
+    env_file:
+      - .env
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - ./minio-entrypoint.sh:/minio-entrypoint.sh:ro
+      - ./.data/minio:/data
+    networks:
+      - process_api_net
+
+  postgres:
+    container_name: postgres
+    image: postgres:17.2-alpine3.20
+    env_file:
+      - .env
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./.data/postgres:/var/lib/postgresql/data
+    networks:
+      - process_api_net
+
+networks:
+  process_api_net:
+    external: true
