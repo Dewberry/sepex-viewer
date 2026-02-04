@@ -16,8 +16,8 @@ from sepex import (
 # ---------- Page config ----------
 st.set_page_config(layout="wide")
 st.title("SEPEX Dashboard")
-
 api = SepexAPI()
+
 
 # ---------- Session state ----------
 if "selected_job_id" not in st.session_state:
@@ -30,7 +30,7 @@ df_all = raw_all if isinstance(raw_all, pd.DataFrame) else pd.DataFrame()
 # ---------- TOP: Jobs overview (KPIs + plots) ----------
 st.subheader("Jobs overview")
 render_jobs_overview(df_all.to_dict(orient="records"), api=api)
-
+st.write(api.base_url)
 st.markdown("---")
 
 # ---------- Fetch processes ----------
