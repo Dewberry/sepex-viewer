@@ -1,0 +1,98 @@
+info:
+  version: '2.3.2026'
+  id: seed-gen-seeds
+  title: Seed Generation
+  description:  Calls cc-seed-generator-plugin to generate seeds using blocks.json configuration file
+  jobControlOptions:
+    - sync-execute
+  outputTransmission:
+
+host:
+  type: docker
+  image: seed-generator-plugin:sepex
+
+command:
+
+config:
+  maxResources:
+    cpus: 0.1
+    memory: 256
+  volumes:
+    - /mnt/sepex:/mnt
+
+inputs:
+  - id: payload_key_s3
+    title: payload
+    description: NOT IMPLEMENTED - user provided payload file (s3 key)
+    input:
+      literalDataDomain:
+        dataType: value
+        valueDefinition:
+          anyValue: true
+    minOccurs: 0
+    maxOccurs: 0
+
+  - id: attributes
+    title: attributes
+    description: user provided attributes
+    input:
+      literalDataDomain:
+        dataType: list
+        valueDefinition:
+          anyValue: true
+    minOccurs: 0
+    maxOccurs: 100
+
+  - id: stores
+    title: stores
+    description: user provided stores
+    input:
+      literalDataDomain:
+        dataType: list
+        valueDefinition:
+          anyValue: true
+    minOccurs: 0
+    maxOccurs: 100
+
+  - id: actions
+    title: actions
+    description: user provided actions
+    input:
+      literalDataDomain:
+        dataType: list
+        valueDefinition:
+          anyValue: true
+    minOccurs: 0
+    maxOccurs: 100
+
+  - id: inputs
+    title: inputs
+    description: user provided inputs
+    input:
+      literalDataDomain:
+        dataType: list
+        valueDefinition:
+          anyValue: true
+    minOccurs: 0
+    maxOccurs: 100
+
+  - id: outputs
+    title: outputs
+    description: user provided outputs
+    input:
+      literalDataDomain:
+        dataType: list
+        valueDefinition:
+          anyValue: true
+    minOccurs: 0
+    maxOccurs: 100
+
+outputs:
+  - id: seeds_json
+    title: seeds.json
+    description: generated seeds configuration file
+    output:
+      transmissionMode:
+      - reference
+      format: application/json
+      href: /mnt/seeds.json
