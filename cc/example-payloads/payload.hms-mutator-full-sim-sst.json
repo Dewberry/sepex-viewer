@@ -1,0 +1,86 @@
+{
+    "attributes": {},
+    "stores": [
+        {
+            "name": "FSB",
+            "store_type": "FS",
+            "params": {
+                "root": "/data/hms-mutator-full-sim-sst"
+            }
+        },
+        {
+            "name": "FishnetStore",
+            "store_type": "FS",
+            "params": {
+                "root": "/data/hms-mutator-fishnets"
+            }
+        },
+        {
+            "name": "SeedsStore",
+            "store_type": "FS",
+            "params": {
+                "root": "/data/seed-generator-seeds"
+            }
+        },
+        {
+            "name": "BlocksStore",
+            "store_type": "FS",
+            "params": {
+                "root": "/data/seed-generator-blocks"
+            }
+        }
+    ],
+    "actions": [
+        {
+            "type": "full_simulation_sst",
+            "name": "full_simulation_sst",
+            "description": "sample and place storms",
+            "attributes": {
+                "output_data_source": "storms",
+                "storms_directory": "storms/",
+                "storms_store": "FSB",
+                "fishnet_directory": "fishnets/",
+                "fishnet_store": "FishnetStore",
+                "fishnet_type_or_name": "name",
+                "storm_type_seasonality_distribution_directory": "seasonality_distributions/",
+                "storm_type_seasonality_distribution_store": "FSB",
+                "basin_root_directory": "data/basinmodels",
+                "basin_name": "trinity",
+                "por_start_date": "20201001",
+                "por_end_date": "20210930",
+                "calibration_event_names": [
+                    "apr_may_1990",
+                    "aug_sep_2017",
+                    "dec_1991"
+                ],
+                "seed_datasource_key": "seeds",
+                "blocks_datasource_key": "blocks"
+            },
+            "inputs": [
+                {
+                    "name": "seeds",
+                    "store_name": "SeedsStore",
+                    "paths": {
+                        "default": "seeds.json"
+                    }
+                },
+                {
+                    "name": "blocks",
+                    "store_name": "BlocksStore",
+                    "paths": {
+                        "default": "blocks.json"
+                    }
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "storms",
+                    "paths": {
+                        "default": "storms.csv"
+                    },
+                    "store_name": "FSB"
+                }
+            ]
+        }
+    ]
+}

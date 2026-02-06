@@ -1,0 +1,57 @@
+{
+    "attributes": {},
+    "stores": [
+        {
+            "name": "FSB",
+            "store_type": "FS",
+            "params": {
+                "root": "/data/fragility-curve"
+            }
+        },
+        {
+            "name": "SeedsStore",
+            "store_type": "FS",
+            "params": {
+                "root": "/data/seed-generator-seeds"
+            }
+        }
+    ],
+    "inputs": [],
+    "actions": [
+        {
+            "name": "all-samples",
+            "type": "all-samples",
+            "description": "create failure_elevations",
+            "attributes": {
+                "seeds_format": false,
+                "elevations_format": false
+            },
+            "inputs": [
+                {
+                    "name": "fragilitycurve",
+                    "paths": {
+                        "default": "conformance_system_response_curves.json"
+                    },
+                    "store_name": "FSB"
+                },
+                {
+                    "name": "seeds",
+                    "paths": {
+                        "default": "seeds.json"
+                    },
+                    "store_name": "SeedsStore"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "failure_elevations",
+                    "paths": {
+                        "default": "failure_elevations.csv",
+                        "event": "failure_elevations.json"
+                    },
+                    "store_name": "FSB"
+                }
+            ]
+        }
+    ]
+}

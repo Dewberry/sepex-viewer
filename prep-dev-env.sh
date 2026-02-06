@@ -20,7 +20,7 @@ echo "Data directories ready"
 docker build ./cc/cc-adapter -t cc-sepex-adapter:local
 
 # Define plugins to build
-declare -a plugins=("seed-generator")
+declare -a plugins=("seed-generator" "fragility-curve" "hms-mutator" "hms-runner" "ressim-runner")
 
 # Build plugins and copy YAML configs
 for plugin in "${plugins[@]}"; do
@@ -40,3 +40,6 @@ done
 # Create /mnt/sepex directory for local data storage
 mkdir -p /mnt/sepex 2>/dev/null || sudo mkdir -p /mnt/sepex
 echo "Created /mnt/sepex directory for local data storage"
+
+mkdir -p /mnt/sepex-data 2>/dev/null || sudo mkdir -p /mnt/sepex-data
+echo "Created /mnt/sepex-data directory for local data storage"
