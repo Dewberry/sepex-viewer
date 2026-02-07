@@ -22,6 +22,10 @@ if "auto_refresh" not in st.session_state:
 raw_all = api.fetch_table("jobs", Job, params={"limit": 500, "offset": 0})
 df_all = raw_all if isinstance(raw_all, pd.DataFrame) else pd.DataFrame()
 
+# Ensure datetime is parsed on the full dataset first
+if not df_all.empty and "updated" in df_all.columns:
+    df_all["updated"] = pd.to_datetime(df_all["updated"], utc=True)
+
 
 # ---------- Get filter inputs for early application ----------
 # Create placeholder columns to capture filter values before rendering charts
@@ -37,7 +41,7 @@ with filter_placeholder:
 
     with time_col1:
         time_filter = st.selectbox(
-            "Select time range:", ["All Time", "Last 24 Hours", "Last 7 Days", "Last 30 Days", "Custom"]
+            "Select time range:", ["Last 24 Hours", "All Time", "Last 7 Days", "Last 30 Days", "Custom"], index=0
         )
 
     # Placeholder for custom date inputs
@@ -62,23 +66,21 @@ if search_query and not df_filtered.empty:
 
 # Then apply time filter
 if time_filter != "All Time" and not df_filtered.empty:
-    df_filtered["updated"] = pd.to_datetime(df_filtered["updated"])
-    now = datetime.now()
+    now = pd.Timestamp.now(tz="UTC")
 
     if time_filter == "Last 24 Hours":
         cutoff = now - timedelta(days=1)
+        df_filtered = df_filtered[df_filtered["updated"] >= cutoff]
     elif time_filter == "Last 7 Days":
         cutoff = now - timedelta(days=7)
+        df_filtered = df_filtered[df_filtered["updated"] >= cutoff]
     elif time_filter == "Last 30 Days":
         cutoff = now - timedelta(days=30)
-    elif time_filter == "Custom":
-        cutoff = pd.Timestamp(start_date)
-        df_filtered = df_filtered[
-            (df_filtered["updated"] >= cutoff) & (df_filtered["updated"] <= pd.Timestamp(end_date))
-        ]
         df_filtered = df_filtered[df_filtered["updated"] >= cutoff]
-    else:
-        df_filtered = df_filtered[df_filtered["updated"] >= cutoff]
+    elif time_filter == "Custom" and start_date and end_date:
+        cutoff = pd.Timestamp(start_date, tz="UTC")
+        end = pd.Timestamp(end_date, tz="UTC") + timedelta(days=1)  # Include end date
+        df_filtered = df_filtered[(df_filtered["updated"] >= cutoff) & (df_filtered["updated"] < end)]
 
 # ---------- FETCH PROCESSES ----------
 processes_dict = api.fetch_processes_dict()

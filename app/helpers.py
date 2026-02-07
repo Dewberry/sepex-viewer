@@ -88,64 +88,64 @@ def render_jobs_overview(
 
     # Ensure "updated" is datetime
     if "updated" in display_df.columns:
-        display_df["updated"] = pd.to_datetime(display_df["updated"])
+        display_df["updated"] = pd.to_datetime(display_df["updated"], utc=True)
 
     if "updated" in display_df.columns and not display_df["updated"].isna().all():
-        min_ts = display_df["updated"].min()
-        max_ts = display_df["updated"].max()
-        span = max_ts - min_ts
+        # Filter to past 24 hours
+        now = pd.Timestamp.now(tz="UTC")
+        cutoff = now - pd.Timedelta(days=1)
+        chart_df = display_df[display_df["updated"] >= cutoff].copy()
 
-        # Dynamic bucket (minimum 1 hour)
-        if span >= pd.Timedelta(days=7):
-            bucket = "1d"
-        elif span >= pd.Timedelta(days=2):
-            bucket = "12h"
-        else:
-            bucket = "1h"
+        if not chart_df.empty:
+            # Set index for resampling
+            chart_df = chart_df.sort_values("updated")
+            chart_df.set_index("updated", inplace=True)
 
-        ts_df = display_df.set_index("updated").copy()
-        counts = ts_df.groupby([pd.Grouper(freq=bucket), "status"]).size().reset_index(name="count")
+            # Resample by 1 hour
+            counts = chart_df.groupby([pd.Grouper(freq="1h"), "status"]).size().reset_index(name="count")
+            counts.columns = ["updated", "status", "count"]
 
-        # Reset the "updated" column name if it was lost
-        if "updated" not in counts.columns and counts.index.name == "updated":
-            counts = counts.reset_index()
+            if not counts.empty:
+                status_domain = ["failed", "running", "successful", "accepted", "dismissed"]
+                status_colors = ["#d62728", "#ffbf00", "#2ca02c", "#ff7f0e", "#9467bd"]
 
-        if not counts.empty:
-            status_domain = ["failed", "running", "successful", "accepted", "dismissed"]
-            status_colors = ["#d62728", "#ffbf00", "#2ca02c", "#ff7f0e", "#9467bd"]
+                # Filter statuses that actually exist
+                existing_statuses = counts["status"].unique().tolist()
+                filtered_domain = [s for s in status_domain if s in existing_statuses]
+                filtered_colors = [status_colors[i] for i, s in enumerate(status_domain) if s in existing_statuses]
 
-            # Create selection objects for interactivity
-            status_select = alt.selection_multi(fields=["status"], bind="legend")
-            time_brush = alt.selection_interval(encodings=["x"])
+                status_select = alt.selection_multi(fields=["status"], bind="legend")
 
-            # Calculate max count for y-axis domain
-            max_count = counts["count"].max() if not counts.empty else 1
+                max_count = counts["count"].max()
 
-            chart = (
-                alt.Chart(counts)
-                .mark_bar()
-                .encode(
-                    x=alt.X("updated:T", title="Time (UTC)", scale=alt.Scale(domain=[min_ts, max_ts])),
-                    y=alt.Y("count:Q", title="Jobs", stack="zero", scale=alt.Scale(domain=[0, max_count * 1.1])),
-                    color=alt.Color(
-                        "status:N",
-                        title="Status",
-                        scale=alt.Scale(domain=status_domain, range=status_colors),
-                    ),
-                    opacity=alt.condition(status_select, alt.value(1), alt.value(0.2)),
-                    tooltip=[
-                        alt.Tooltip("updated:T", title="Time", format="%Y-%m-%d %H:%M:%S"),
-                        alt.Tooltip("status:N", title="Status"),
-                        alt.Tooltip("count:Q", title="Count"),
-                    ],
+                chart = (
+                    alt.Chart(counts)
+                    .mark_bar()
+                    .encode(
+                        x=alt.X("updated:T", title="Time (UTC)", axis=alt.Axis(format="%m/%d %H:%M")),
+                        y=alt.Y("count:Q", title="Job Count", scale=alt.Scale(domain=[0, max_count * 1.15])),
+                        color=alt.Color(
+                            "status:N",
+                            title="Status",
+                            scale=alt.Scale(domain=filtered_domain, range=filtered_colors),
+                        ),
+                        opacity=alt.condition(status_select, alt.value(1), alt.value(0.2)),
+                        tooltip=[
+                            alt.Tooltip("updated:T", title="Time", format="%Y-%m-%d %H:%M:%S"),
+                            alt.Tooltip("status:N", title="Status"),
+                            alt.Tooltip("count:Q", title="Count"),
+                        ],
+                    )
+                    .add_selection(status_select)
+                    .interactive()
+                    .properties(width=800, height=300)
                 )
-                .add_selection(status_select)
-                .add_selection(time_brush)
-                .interactive()
-                .properties(width=800, height=300)
-            )
 
-            left_col.altair_chart(chart, use_container_width=True)
+                left_col.altair_chart(chart, use_container_width=True)
+            else:
+                left_col.info("No data available for the selected time range")
+        else:
+            left_col.info("No data in the past 24 hours")
 
         # ---------- Process distribution pie ----------
         if "processID" in display_df.columns:
