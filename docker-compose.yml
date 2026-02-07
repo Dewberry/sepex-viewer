@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./.data/api:/.data
+      - ./local/api:/app/local
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - process_api_net
@@ -28,7 +28,7 @@ services:
       - '8501:8501'
     volumes:
       - .:/app                # for local builds and code changes
-      - /mnt/sepex:/mnt/sepex # mount sepex data directory
+      - ./local:/data         # mount sepex data directory
     networks:
       - process_api_net
     depends_on:
@@ -46,7 +46,7 @@ services:
       - '9001:9001'
     volumes:
       - ./minio-entrypoint.sh:/minio-entrypoint.sh:ro
-      - ./.data/minio:/data
+      - ./local/minio:/data
     networks:
       - process_api_net
 
@@ -63,7 +63,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ./.data/postgres:/var/lib/postgresql/data
+      - ./local/postgres:/var/lib/postgresql/data
     networks:
       - process_api_net
 

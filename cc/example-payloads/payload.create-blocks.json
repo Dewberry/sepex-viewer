@@ -38,7 +38,7 @@
     {
       "name": "FSB",
       "params": {
-        "root": "/mnt"
+        "root": "/data/seed-generator-seeds"
       },
       "store_type": "FS"
     }
