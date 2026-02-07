@@ -4,22 +4,21 @@ info:
   title: HMS Mutator Full Sim SST
   description: Calls cc-hms-mutator-full-sim-sst
   jobControlOptions:
-    - sync-execute
+    - async-execute
   outputTransmission:
 
 host:
   type: docker
-  image: hms-mutator-full-sim-sst:sepex
+  image: hms-mutator-plugin:sepex
 
 command:
 
 config:
   maxResources:
-    cpus: 0.1
-    memory: 256
+    cpus: 6
+    memory: 16348
   volumes:
-    - /mnt/sepex:/mnt
-    - /mnt/sepex-data:/data
+    - ./data:/data
 
 inputs:
   - id: payload_key_s3

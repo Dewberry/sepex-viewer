@@ -2,11 +2,18 @@
     "attributes": {},
     "stores": [
         {
-            "name": "FSB",
+            "name": "SeedsStore",
             "store_type": "FS",
             "params": {
-                "root": "/mnt"
+                "root": "/data/seed-generator-seeds"
             }
+        },
+        {
+            "name": "BlocksStore",
+            "params": {
+                "root": "/data/seed-generator-blocks"
+            },
+            "store_type": "FS"
         }
     ],
     "actions": [
@@ -38,7 +45,7 @@
                     "paths": {
                         "default": "blocks.json"
                     },
-                    "store_name": "FSB"
+                    "store_name": "BlocksStore"
                 }
             ],
             "outputs": [
@@ -47,7 +54,7 @@
                     "paths": {
                         "default": "seeds.json"
                     },
-                    "store_name": "FSB"
+                    "store_name": "SeedsStore"
                 }
             ]
         }

@@ -2,7 +2,7 @@
     "attributes": {},
     "stores": [
         {
-            "name": "FSB",
+            "name": "SimStore",
             "store_type": "FS",
             "params": {
                 "root": "/data/hms-mutator-full-sim-sst"
@@ -38,7 +38,7 @@
             "attributes": {
                 "output_data_source": "storms",
                 "storms_directory": "storms/",
-                "storms_store": "FSB",
+                "storms_store": "SimStore",
                 "fishnet_directory": "fishnets/",
                 "fishnet_store": "FishnetStore",
                 "fishnet_type_or_name": "name",
@@ -78,7 +78,7 @@
                     "paths": {
                         "default": "storms.csv"
                     },
-                    "store_name": "FSB"
+                    "store_name": "SimStore"
                 }
             ]
         }

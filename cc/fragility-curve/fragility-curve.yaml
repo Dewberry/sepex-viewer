@@ -18,8 +18,7 @@ config:
     cpus: 0.1
     memory: 256
   volumes:
-    - /mnt/sepex:/mnt
-    - /mnt/sepex-data:/data
+    - ./data:/data
 
 inputs:
   - id: payload_key_s3

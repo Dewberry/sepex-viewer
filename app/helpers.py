@@ -84,51 +84,68 @@ def render_jobs_overview(
         k4.metric("Last seen (UTC)", "N/A")
 
     # ---------- Charts row ----------
-    left_col, right_col = st.columns([2, 1])
+    left_col, right_col = st.columns([1.6, 1.4])
+
+    # Ensure "updated" is datetime
+    if "updated" in display_df.columns:
+        display_df["updated"] = pd.to_datetime(display_df["updated"])
 
     if "updated" in display_df.columns and not display_df["updated"].isna().all():
         min_ts = display_df["updated"].min()
         max_ts = display_df["updated"].max()
         span = max_ts - min_ts
 
-        # Dynamic bucket
+        # Dynamic bucket (minimum 1 hour)
         if span >= pd.Timedelta(days=7):
             bucket = "1d"
         elif span >= pd.Timedelta(days=2):
             bucket = "12h"
-        elif span >= pd.Timedelta(hours=6):
-            bucket = "1h"
         else:
-            bucket = "15min"
+            bucket = "1h"
 
         ts_df = display_df.set_index("updated").copy()
         counts = ts_df.groupby([pd.Grouper(freq=bucket), "status"]).size().reset_index(name="count")
+
+        # Reset the "updated" column name if it was lost
+        if "updated" not in counts.columns and counts.index.name == "updated":
+            counts = counts.reset_index()
 
         if not counts.empty:
             status_domain = ["failed", "running", "successful", "accepted", "dismissed"]
             status_colors = ["#d62728", "#ffbf00", "#2ca02c", "#ff7f0e", "#9467bd"]
 
+            # Create selection objects for interactivity
+            status_select = alt.selection_multi(fields=["status"], bind="legend")
+            time_brush = alt.selection_interval(encodings=["x"])
+
+            # Calculate max count for y-axis domain
+            max_count = counts["count"].max() if not counts.empty else 1
+
             chart = (
                 alt.Chart(counts)
                 .mark_bar()
                 .encode(
-                    x=alt.X("updated:T", title="Time"),
-                    y=alt.Y("count:Q", title="Jobs", stack="zero"),
+                    x=alt.X("updated:T", title="Time (UTC)", scale=alt.Scale(domain=[min_ts, max_ts])),
+                    y=alt.Y("count:Q", title="Jobs", stack="zero", scale=alt.Scale(domain=[0, max_count * 1.1])),
                     color=alt.Color(
                         "status:N",
                         title="Status",
                         scale=alt.Scale(domain=status_domain, range=status_colors),
                     ),
+                    opacity=alt.condition(status_select, alt.value(1), alt.value(0.2)),
                     tooltip=[
-                        alt.Tooltip("updated:T", title="time"),
-                        alt.Tooltip("status:N", title="status"),
-                        alt.Tooltip("count:Q", title="count"),
+                        alt.Tooltip("updated:T", title="Time", format="%Y-%m-%d %H:%M:%S"),
+                        alt.Tooltip("status:N", title="Status"),
+                        alt.Tooltip("count:Q", title="Count"),
                     ],
                 )
+                .add_selection(status_select)
+                .add_selection(time_brush)
                 .interactive()
+                .properties(width=800, height=300)
             )
 
-            left_col.altair_chart(chart, width="stretch")
+            left_col.altair_chart(chart, use_container_width=True)
 
         # ---------- Process distribution pie ----------
         if "processID" in display_df.columns:
@@ -150,21 +167,22 @@ def render_jobs_overview(
                     ignore_index=True,
                 )
 
-            pie = (
+            proc_pie = (
                 alt.Chart(proc_counts)
                 .mark_arc(innerRadius=50)
                 .encode(
                     theta=alt.Theta(field="count", type="quantitative"),
-                    color=alt.Color("process_title:N", title="Process"),
+                    color=alt.Color("process_title:N", title="Process", scale=alt.Scale(scheme="set2")),
                     tooltip=[
                         alt.Tooltip("process_title:N", title="process"),
                         alt.Tooltip("count:Q", title="jobs"),
                     ],
                 )
+                .properties(width=300, height=250)
+                .configure_legend(orient="right", labelFontSize=9, titleFontSize=10)
             )
-            right_col.altair_chart(pie, width="stretch")
 
-            # ---------- Submitter distribution ----------
+            # ---------- Submitter distribution pie ----------
             if "submitter" in display_df.columns:
                 sub_counts = display_df["submitter"].value_counts().reset_index()
                 sub_counts.columns = ["submitter", "count"]
@@ -181,20 +199,27 @@ def render_jobs_overview(
                         ignore_index=True,
                     )
 
-                sub_bar = (
+                sub_pie = (
                     alt.Chart(sub_counts)
-                    .mark_bar()
+                    .mark_arc(innerRadius=50)
                     .encode(
-                        x=alt.X("count:Q", title="Jobs"),
-                        y=alt.Y("submitter:N", sort="-x", title="Submitter"),
+                        theta=alt.Theta(field="count", type="quantitative"),
+                        color=alt.Color("submitter:N", title="Submitter", scale=alt.Scale(scheme="dark2")),
                         tooltip=[
                             alt.Tooltip("submitter:N", title="submitter"),
                             alt.Tooltip("count:Q", title="jobs"),
                         ],
                     )
+                    .properties(width=300, height=250)
+                    .configure_legend(orient="right", labelFontSize=9, titleFontSize=10)
                 )
-                right_col.altair_chart(sub_bar, width="stretch")
+
+                # Create two columns for pie charts side by side
+                pie_col1, pie_col2 = right_col.columns(2)
+                pie_col1.altair_chart(proc_pie, use_container_width=True)
+                pie_col2.altair_chart(sub_pie, use_container_width=True)
             else:
+                right_col.altair_chart(proc_pie, use_container_width=True)
                 right_col.info("No submitter data to show distribution.")
         else:
             right_col.info("No processID field to show distribution.")

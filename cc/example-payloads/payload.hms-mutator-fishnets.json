@@ -2,7 +2,7 @@
   "attributes": {},
   "stores": [
     {
-      "name": "FSB",
+      "name": "FishnetStore",
       "store_type": "FS",
       "params": {
         "root": "/data/hms-mutator-fishnets"
@@ -22,21 +22,21 @@
       "paths": {
         "grid": "catalog.grid"
       },
-      "store_name": "FSB"
+      "store_name": "FishnetStore"
     },
     {
       "name": "TranspositionRegion",
       "paths": {
         "default": "transposition-domain.gpkg"
       },
-      "store_name": "FSB"
+      "store_name": "FishnetStore"
     },
     {
       "name": "WatershedBoundary",
       "paths": {
         "default": "watershed-boundary.gpkg"
       },
-      "store_name": "FSB"
+      "store_name": "FishnetStore"
     },
     {
       "name": "seeds",
@@ -52,7 +52,7 @@
       "paths": {
         "default": "fishnets"
       },
-      "store_name": "FSB"
+      "store_name": "FishnetStore"
     }
   ],
   "actions": [

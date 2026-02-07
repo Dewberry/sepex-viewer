@@ -17,7 +17,7 @@
           "paths": {
             "default": "blocks.json"
           },
-          "store_name": "FSB"
+          "store_name": "BlocksStore"
         }
       ],
       "type": "block-generation-fixed-length"
@@ -31,14 +31,14 @@
       "paths": {
         "default": "blocks.json"
       },
-      "store_name": "FSB"
+      "store_name": "BlocksStore"
     }
   ],
   "stores": [
     {
-      "name": "FSB",
+      "name": "BlocksStore",
       "params": {
-        "root": "/data/seed-generator-seeds"
+        "root": "/data/seed-generator-blocks"
       },
       "store_type": "FS"
     }
