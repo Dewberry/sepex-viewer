@@ -28,7 +28,7 @@ services:
       - '8501:8501'
     volumes:
       - .:/app                # for local builds and code changes
-      - ./local:/data         # mount sepex data directory
+      - ./data:/data          # mount sepex data directory
     networks:
       - process_api_net
     depends_on:

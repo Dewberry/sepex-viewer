@@ -3,9 +3,10 @@ set -euo pipefail
 
 declare -a sepex_directories=("postgres" "minio" "api/plugins/cc" "logs" "tmp/job_logs" "plugins")
 
-declare -a data_directories=("sepex" "sepex-data" )
-
 declare -a plugins=("seed-generator" "fragility-curve" "hms-mutator") # "hms-runner" "ressim-runner")
+
+declare -a data_directories=("seed-generator-seeds" "seed-generator-blocks" "fragility-curve" "hms-mutator-fishnets" \
+    "hms-mutator-full-sim-sst" "hms-runner" "ressim-runner")
 
 # Copy .env.example to .env if .env doesn't exist
 if [ ! -f ./.env ]; then
@@ -56,6 +57,8 @@ for plugin in "${plugins[@]}"; do
     if [ -f "$yaml_file" ]; then
       filename=$(basename "$yaml_file")
       cp "$yaml_file" "$SEPEX_DIR/api/plugins/cc/$filename"
+      # Replace ./data:/data with absolute path:/data in the copied YAML file (only first occurrence)
+      sed -i '' "s|./data:/data|$(pwd)/$DATA_DIR:/data|" "$SEPEX_DIR/api/plugins/cc/$filename"
       echo "Copied $filename to plugins directory"
     fi
   done
