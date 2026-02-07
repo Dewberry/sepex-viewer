@@ -176,7 +176,7 @@ if selected_process_id and selected_process_id != "All":
 st.markdown("---")
 
 # ---------- BOTTOM: KPIs Section ----------
-st.subheader("📊 Key Performance Indicators")
+st.subheader("Key Performance Indicators")
 if not df_all.empty:
     kpi_col1, kpi_col2, kpi_col3, kpi_col4, kpi_col5 = st.columns(5)
 

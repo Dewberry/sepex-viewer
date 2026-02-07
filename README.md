@@ -6,10 +6,10 @@ Prototype Dashboard for [sepex](https://github.com/Dewberry/sepex)
 
 ![](imgs/dashboard.png)
 
-**Monitor**: Detailed job management table with submit/dismiss controls and job status tracking
+**Monitor**:  Browse job information table for results, metadata, and logging
 
 ![](imgs/monitor.png)
 
-**Manage**: Browse available processes with submission forms for launching / dismissing  jobs
+**Manage**: Job management table with submit/dismiss controls 
 
 ![](imgs/manager.png)
