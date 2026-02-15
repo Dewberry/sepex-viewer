@@ -8,3 +8,4 @@ data/
 local/
 .DS_Store
 data-old/
+test-data/
