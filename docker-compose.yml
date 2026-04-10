@@ -1,7 +1,7 @@
 services:
   sepex:
     container_name: sepex
-    image: ghcr.io/dewberry/sepex/api:dev-2025.11.0-beta
+    image: ghcr.io/dewberry/sepex:0.2.2
     ports:
       - '5050:5050'
     env_file:
@@ -28,7 +28,8 @@ services:
       - '8501:8501'
     volumes:
       - .:/app                # for local builds and code changes
-      - /mnt/sepex:/mnt/sepex # mount sepex data directory
+      # - /mnt/sepex:/mnt/sepex # mount sepex data directory
+      - /home/slawler/repos/sepex-viewer/examples:/mnt/sepex # mount examples directory
     networks:
       - process_api_net
     depends_on:

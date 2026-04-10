@@ -1,0 +1,56 @@
+info:
+  version: '4.10.2026'
+  id: twodimfim test
+  title: TwoDimFIM Test
+  description: Calls twodimfim
+  jobControlOptions:
+    - sync-execute
+  outputTransmission:
+
+host:
+  type: docker
+  image: twodimfim:sepex
+
+command:
+
+config:
+  maxResources:
+    cpus: 0.1
+    memory: 256
+  volumes:
+    - /mnt/sepex:/mnt
+    - /mnt/sepex-data:/data
+
+inputs:
+  - id: inputs
+    title: inputs
+    description: user provided inputs
+    input:
+      literalDataDomain:
+        dataType: list
+        valueDefinition:
+          anyValue: true
+    minOccurs: 0
+    maxOccurs: 100
+
+  - id: outputs
+    title: outputs
+    description: user provided outputs
+    input:
+      literalDataDomain:
+        dataType: list
+        valueDefinition:
+          anyValue: true
+    minOccurs: 0
+    maxOccurs: 100
+
+
+outputs:
+  - id: data_json
+    title: data.json
+    description: generic description of the output
+    output:
+      transmissionMode:
+      - reference
+      format: application/json
+      href: /mnt/data.json

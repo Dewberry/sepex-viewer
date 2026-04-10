@@ -13,29 +13,35 @@ fi
 echo "Setting up data directories..."
 mkdir -p ./.data/postgres
 mkdir -p ./.data/minio
-mkdir -p ./.data/api/plugins/cc
+mkdir -p ./.data/api/plugins/local
+# Set permissions for api data directory so container can write to it
+chmod 755 ./.data/api
+chmod 755 ./.data/api/plugins
+chmod 755 ./.data/api/plugins/local
 echo "Data directories ready"
 
 # Build main adapter
-docker build ./cc/cc-adapter -t cc-sepex-adapter:local
+docker build ./local/adapter -t sepex-adapter:local
 
 # Define plugins to build
-declare -a plugins=("seed-generator" "fragility-curve" "hms-mutator" "hms-runner" "ressim-runner")
+declare -a plugins=("twodimfim")
 
 # Build plugins and copy YAML configs
 for plugin in "${plugins[@]}"; do
   echo "Building plugin: $plugin"
-  docker build "./cc/$plugin" -t "${plugin}-plugin:sepex"
+  docker build "./local/$plugin" -t "${plugin}:sepex"
 
   # Copy YAML configs - find any .yaml files in the plugin directory
-  for yaml_file in "./cc/$plugin"/*.yaml; do
+  for yaml_file in "./local/$plugin"/*.yaml; do
     if [ -f "$yaml_file" ]; then
       filename=$(basename "$yaml_file")
-      cp "$yaml_file" "./.data/api/plugins/cc/$filename"
+      cp "$yaml_file" "./.data/api/plugins/local/$filename"
       echo "Copied $filename to plugins directory"
     fi
   done
 done
+
+docker network create process_api_net || true
 
 # Create /mnt/sepex directory for local data storage
 mkdir -p /mnt/sepex 2>/dev/null || sudo mkdir -p /mnt/sepex
@@ -43,3 +49,7 @@ echo "Created /mnt/sepex directory for local data storage"
 
 mkdir -p /mnt/sepex-data 2>/dev/null || sudo mkdir -p /mnt/sepex-data
 echo "Created /mnt/sepex-data directory for local data storage"
+
+docker-compose up -d
+echo "Docker containers are starting up..."
+echo "Use 'docker-compose logs -f' to view logs and 'docker-compose down' to stop the environment"
