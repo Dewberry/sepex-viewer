@@ -25,9 +25,36 @@ services:
     env_file:
       - .env
     ports:
-      - '8501:8501'         
+      - '8501:8501'
     volumes:
       - .:/app                # for local builds and code changes
+    networks:
+      - process_api_net
+    depends_on:
+      sepex:
+        condition: service_started
+
+  client:
+    container_name: sepex-viewer-client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      target: dev
+    environment:
+      # Browser hits the host-exposed port. All current data fetching is
+      # client-side via TanStack Query; if RSC fetches are added, plumb a
+      # separate server-only env var pointing at http://sepex:5050.
+      NEXT_PUBLIC_SEPEX_BASE_URL: http://localhost:5050
+      NEXT_PUBLIC_SEPEX_USER_EMAIL: dev@dewberry.local
+      NEXT_TELEMETRY_DISABLED: '1'
+      WATCHPACK_POLLING: 'true'
+      CHOKIDAR_USEPOLLING: 'true'
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./client:/app
+      - /app/node_modules         # keep image's node_modules
+      - /app/.next                 # keep image's .next cache
     networks:
       - process_api_net
     depends_on:
