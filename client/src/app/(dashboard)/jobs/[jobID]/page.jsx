@@ -1,13 +1,19 @@
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
+import JobDetailContent from "@/app/(dashboard)/jobs/[jobID]/_components/JobDetailContent";
+
 export default async function JobDetailPage({ params }) {
   const { jobID } = await params;
   return (
-    <section className="mx-auto max-w-7xl p-6">
-      <h1 className="text-2xl font-semibold tracking-tight">
-        Job <span className="font-mono">{jobID}</span>
-      </h1>
-      <p className="mt-2 text-muted-foreground">
-        Job detail placeholder — status, logs, results, metadata.
-      </p>
-    </section>
+    <div className="mx-auto max-w-[1200px] space-y-6 px-4 py-6 lg:px-6">
+      <Link
+        href="/jobs"
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ChevronLeft className="h-4 w-4" />
+        Back to jobs
+      </Link>
+      <JobDetailContent jobID={jobID} />
+    </div>
   );
 }
