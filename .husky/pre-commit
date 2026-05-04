@@ -1,0 +1,15 @@
+cd client
+
+# Auto-fix staged files
+echo "Auto-fixing staged files..."
+npx lint-staged
+
+# Full lint over the codebase
+echo "Running full lint check..."
+npm run lint
+if [ $? -ne 0 ]; then
+    echo "ESLint failed. Please fix linting errors before committing."
+    exit 1
+fi
+
+echo "All lint checks passed!"

@@ -109,7 +109,10 @@ async function request(
 export const listProcesses = (opts) => request("/processes", opts);
 export const getProcess = (id, opts) => request(`/processes/${id}`, opts);
 
-export const executeProcess = (id, { inputs, tags, async: isAsync, ...opts } = {}) =>
+export const executeProcess = (
+  id,
+  { inputs, tags, async: isAsync, ...opts } = {}
+) =>
   request(`/processes/${id}/execution`, {
     ...opts,
     method: "POST",
@@ -121,7 +124,15 @@ export const executeProcess = (id, { inputs, tags, async: isAsync, ...opts } = {
   });
 
 // ── Jobs ─────────────────────────────────────────────────────
-export const listJobs = ({ limit, offset, processID, status, submitter, tags, ...opts } = {}) =>
+export const listJobs = ({
+  limit,
+  offset,
+  processID,
+  status,
+  submitter,
+  tags,
+  ...opts
+} = {}) =>
   request("/jobs", {
     ...opts,
     query: { limit, offset, processID, status, submitter, tags }
@@ -129,8 +140,10 @@ export const listJobs = ({ limit, offset, processID, status, submitter, tags, ..
 
 export const getJob = (jobID, opts) => request(`/jobs/${jobID}`, opts);
 export const getJobLogs = (jobID, opts) => request(`/jobs/${jobID}/logs`, opts);
-export const getJobResults = (jobID, opts) => request(`/jobs/${jobID}/results`, opts);
-export const getJobMetadata = (jobID, opts) => request(`/jobs/${jobID}/metadata`, opts);
+export const getJobResults = (jobID, opts) =>
+  request(`/jobs/${jobID}/results`, opts);
+export const getJobMetadata = (jobID, opts) =>
+  request(`/jobs/${jobID}/metadata`, opts);
 export const dismissJob = (jobID, opts) =>
   request(`/jobs/${jobID}`, { ...opts, method: "DELETE" });
 

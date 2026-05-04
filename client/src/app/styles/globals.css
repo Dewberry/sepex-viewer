@@ -157,10 +157,11 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-sans: var(--font-open-sans), "Open Sans", system-ui, -apple-system,
-    sans-serif;
-  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace,
-    "SF Mono", Menlo, monospace;
+  --font-sans:
+    var(--font-open-sans), "Open Sans", system-ui, -apple-system, sans-serif;
+  --font-mono:
+    var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, "SF Mono",
+    Menlo, monospace;
 }
 
 /* ── Base layer ─────────────────────────────────────────────── */

@@ -2,24 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Search } from "lucide-react";
-
-import { Form } from "@/components/ui/form";
-import { Skeleton } from "@/components/ui/skeleton";
-
-import {
-  executeProcess,
-  getJob,
-  getProcess,
-  listJobs,
-  listProcesses
-} from "@/lib/sepex";
-
+import { useSession } from "next-auth/react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import ActionBar from "@/app/(dashboard)/builder/_components/ActionBar";
 import ExecutionModeCard from "@/app/(dashboard)/builder/_components/ExecutionModeCard";
 import InputsEditor from "@/app/(dashboard)/builder/_components/InputsEditor";
@@ -35,6 +23,15 @@ import {
   buildYaml,
   buildZodSchema
 } from "@/app/(dashboard)/builder/_utils/schema";
+import { Form } from "@/components/ui/form";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  executeProcess,
+  getJob,
+  getProcess,
+  listJobs,
+  listProcesses
+} from "@/lib/sepex";
 
 const DEFAULT_USER_EMAIL =
   process.env.NEXT_PUBLIC_SEPEX_USER_EMAIL || "dev@dewberry.local";
@@ -53,8 +50,11 @@ export default function BuilderPage() {
   const [showRecent, setShowRecent] = useState(false);
   const [rawJsonText, setRawJsonText] = useState({});
 
-  const { templates, save: saveTemplate, remove: removeTemplate } =
-    useSavedTemplates();
+  const {
+    templates,
+    save: saveTemplate,
+    remove: removeTemplate
+  } = useSavedTemplates();
 
   useEffect(() => {
     if (session?.user?.email) setSubmitter(session.user.email);
@@ -272,7 +272,9 @@ export default function BuilderPage() {
               <SubmitterCard value={submitter} onChange={setSubmitter} />
               <TagsCard
                 tags={tags}
-                onAdd={(t) => setTags((prev) => (prev.includes(t) ? prev : [...prev, t]))}
+                onAdd={(t) =>
+                  setTags((prev) => (prev.includes(t) ? prev : [...prev, t]))
+                }
                 onRemove={(t) => setTags((prev) => prev.filter((x) => x !== t))}
               />
               <ExecutionModeCard

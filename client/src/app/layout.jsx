@@ -1,6 +1,6 @@
 import "@/app/styles/globals.css";
-import Providers from "@/app/providers";
 import { jetbrainsMono, openSans } from "@/app/styles/fonts";
+import Providers from "@/app/providers";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata = {

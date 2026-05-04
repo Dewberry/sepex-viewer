@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { FolderOpen, Trash2, X } from "lucide-react";
+import { getRelativeTime } from "@/app/(dashboard)/builder/_utils/relativeTime";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover";
-import { getRelativeTime } from "@/app/(dashboard)/builder/_utils/relativeTime";
 
 export default function LoadTemplatesPopover({
   open,

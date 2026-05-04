@@ -1,6 +1,8 @@
 "use client";
 
 import { ArrowRight, FolderOpen, X } from "lucide-react";
+import StatusIcon from "@/app/(dashboard)/builder/_components/StatusIcon";
+import { getRelativeTime } from "@/app/(dashboard)/builder/_utils/relativeTime";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -8,8 +10,6 @@ import {
   PopoverTrigger
 } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
-import StatusIcon from "@/app/(dashboard)/builder/_components/StatusIcon";
-import { getRelativeTime } from "@/app/(dashboard)/builder/_utils/relativeTime";
 
 export default function RecentPayloadsPopover({
   open,

@@ -6,7 +6,9 @@ export default function ProcessInfoCard({ process: p }) {
         <div>
           <h3 className="font-semibold">{p.title || p.id}</h3>
           {p.description ? (
-            <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {p.description}
+            </p>
           ) : null}
         </div>
         {p.version ? (

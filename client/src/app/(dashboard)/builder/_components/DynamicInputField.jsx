@@ -21,7 +21,9 @@ export default function DynamicInputField({
         {required && <span className="ml-1 text-status-failed">*</span>}
       </label>
       {input.description && (
-        <p className="mb-2 text-xs text-muted-foreground">{input.description}</p>
+        <p className="mb-2 text-xs text-muted-foreground">
+          {input.description}
+        </p>
       )}
 
       <Controller

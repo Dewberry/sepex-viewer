@@ -1,9 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import {
+  Activity,
+  Monitor,
+  Moon,
+  PlayCircle,
+  Sun,
+  Terminal
+} from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useTheme } from "next-themes";
-import { Activity, Monitor, Moon, PlayCircle, Sun, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const SPARK_BARS = [3, 4, 5, 7, 6, 8, 9, 7, 10, 11, 9, 12, 11, 13, 14, 15];
@@ -60,7 +67,9 @@ function SparklineCard() {
   return (
     <>
       <div className="mb-3 flex items-start justify-between">
-        <div className="text-xs text-muted-foreground">Jobs completed · 24h</div>
+        <div className="text-xs text-muted-foreground">
+          Jobs completed · 24h
+        </div>
         <div className="text-xs text-status-successful">+12%</div>
       </div>
       <div className="flex h-12 items-end gap-0.5">
@@ -79,9 +88,9 @@ function SparklineCard() {
 function LogTailCard() {
   return (
     <div className="space-y-1 font-mono text-xs text-muted-foreground">
-      <div>[INFO] 14:23:01  ndvi-tile-007 accepted</div>
-      <div>[INFO] 14:23:02  ndvi-tile-007 → running</div>
-      <div>[INFO] 14:23:18  ndvi-tile-007 → successful</div>
+      <div>[INFO] 14:23:01 ndvi-tile-007 accepted</div>
+      <div>[INFO] 14:23:02 ndvi-tile-007 → running</div>
+      <div>[INFO] 14:23:18 ndvi-tile-007 → successful</div>
     </div>
   );
 }
@@ -157,11 +166,10 @@ export default function LandingPage() {
                   </h1>
                   <p className="text-xl leading-relaxed text-muted-foreground">
                     A modern web UI for any OGC API – Processes server. Submit
-                    jobs, watch them run with live logs and resource gauges,
-                    and inspect results — works for hydrology models,
-                    geospatial analysis, ML pipelines, image processing, or
-                    any other long-running compute workload your team
-                    registers.
+                    jobs, watch them run with live logs and resource gauges, and
+                    inspect results — works for hydrology models, geospatial
+                    analysis, ML pipelines, image processing, or any other
+                    long-running compute workload your team registers.
                   </p>
                 </div>
 
@@ -176,7 +184,11 @@ export default function LandingPage() {
                     </span>
                   </div>
                   <Button size="lg" variant="outline" asChild>
-                    <a href={apiDocsUrl} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={apiDocsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       View API docs
                     </a>
                   </Button>
@@ -260,7 +272,9 @@ export default function LandingPage() {
       <footer className="border-t border-border px-6 py-8">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-xs text-muted-foreground md:flex-row">
           <div className="flex items-center gap-3">
-            <div>Built by Dewberry · MIT license · Free for anyone to deploy</div>
+            <div>
+              Built by Dewberry · MIT license · Free for anyone to deploy
+            </div>
             <a
               href="https://github.com/Dewberry/sepex-viewer"
               target="_blank"
