@@ -2,17 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
+import { getLastUpdatedLabel } from "@/app/(dashboard)/jobs/_utils/relativeTime";
 import { Button } from "@/components/ui/button";
-
-function formatLastUpdated(now, dataUpdatedAt) {
-  if (!dataUpdatedAt) return "never";
-  const sec = Math.max(0, Math.floor((now - dataUpdatedAt) / 1000));
-  if (sec < 5) return "just now";
-  if (sec < 60) return `${sec}s ago`;
-  const min = Math.floor(sec / 60);
-  if (min < 60) return `${min}m ago`;
-  return `${Math.floor(min / 60)}h ago`;
-}
 
 export default function JobsPageHeader({
   resultCount,
@@ -28,7 +19,7 @@ export default function JobsPageHeader({
     return () => clearInterval(id);
   }, []);
 
-  const lastUpdatedLabel = formatLastUpdated(now, dataUpdatedAt);
+  const lastUpdatedLabel = getLastUpdatedLabel(now, dataUpdatedAt);
 
   return (
     <div className="flex flex-wrap items-start justify-between gap-4">

@@ -1,8 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import AppliedFiltersBar from "@/app/(dashboard)/jobs/_components/AppliedFiltersBar";
 import BulkDismissBar from "@/app/(dashboard)/jobs/_components/BulkDismissBar";
 import JobDetailDrawer from "@/app/(dashboard)/jobs/_components/JobDetailDrawer";
@@ -10,9 +9,11 @@ import JobsFilterBar from "@/app/(dashboard)/jobs/_components/JobsFilterBar";
 import JobsPageHeader from "@/app/(dashboard)/jobs/_components/JobsPageHeader";
 import JobsTable from "@/app/(dashboard)/jobs/_components/JobsTable";
 import PaginationFooter from "@/app/(dashboard)/jobs/_components/PaginationFooter";
+import useBulkDismiss from "@/app/(dashboard)/jobs/_hooks/useBulkDismiss";
 import useJobsQuery from "@/app/(dashboard)/jobs/_hooks/useJobsQuery";
 import useSelectedJobUrlSync from "@/app/(dashboard)/jobs/_hooks/useSelectedJobUrlSync";
-import { ACTIVE_STATUSES, dismissJob, listProcesses } from "@/lib/sepex";
+import buildJobsQueryParams from "@/app/(dashboard)/jobs/_utils/buildJobsQueryParams";
+import { ACTIVE_STATUSES, listProcesses } from "@/lib/sepex";
 
 const EMPTY_FILTERS = {
   search: "",
@@ -29,7 +30,6 @@ function JobsPageInner() {
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [pageSize, setPageSize] = useState(20);
   const [offset, setOffset] = useState(0);
-  const [selectedIDs, setSelectedIDs] = useState([]);
 
   // Reset to first page whenever a server-side filter or page size changes.
   useEffect(() => {
@@ -43,30 +43,9 @@ function JobsPageInner() {
   ]);
 
   const queryParams = useMemo(
-    () => ({
-      limit: pageSize,
-      offset,
-      processID: filters.processID || undefined,
-      status: filters.status || undefined,
-      submitter: filters.submitter || undefined,
-      tags: filters.tags
-        ? filters.tags
-            .split(",")
-            .map((t) => t.trim())
-            .filter(Boolean)
-            .join(",")
-        : undefined
-    }),
-    [
-      pageSize,
-      offset,
-      filters.processID,
-      filters.status,
-      filters.submitter,
-      filters.tags
-    ]
+    () => buildJobsQueryParams(filters, pageSize, offset),
+    [filters, pageSize, offset]
   );
-
   const jobsQuery = useJobsQuery(queryParams);
   const links = jobsQuery.data?.links || [];
 
@@ -88,8 +67,9 @@ function JobsPageInner() {
     );
   }, [jobsQuery.data, filters.search]);
 
-  const hasActiveJobs = visibleJobs.some((j) => ACTIVE_STATUSES.has(j.status));
+  const bulk = useBulkDismiss(visibleJobs);
 
+  const hasActiveJobs = visibleJobs.some((j) => ACTIVE_STATUSES.has(j.status));
   const hasNext = links.some((l) => l.title === "next" || l.rel === "next");
   const hasPrev = offset > 0;
   const page = Math.floor(offset / pageSize) + 1;
@@ -97,48 +77,6 @@ function JobsPageInner() {
   const handleClearAll = () => setFilters(EMPTY_FILTERS);
   const handleRefresh = () =>
     queryClient.invalidateQueries({ queryKey: ["jobs"] });
-
-  const toggleRow = (jobID, checked) => {
-    setSelectedIDs((prev) =>
-      checked ? [...prev, jobID] : prev.filter((id) => id !== jobID)
-    );
-  };
-
-  const toggleAll = (checked) => {
-    if (!checked) {
-      setSelectedIDs([]);
-      return;
-    }
-    setSelectedIDs(
-      visibleJobs
-        .filter((j) => ACTIVE_STATUSES.has(j.status))
-        .map((j) => j.jobID)
-    );
-  };
-
-  const dismissMutation = useMutation({
-    mutationFn: async (ids) => {
-      const results = await Promise.allSettled(ids.map((id) => dismissJob(id)));
-      return results.map((r, i) => ({ id: ids[i], result: r }));
-    },
-    onSuccess: (results) => {
-      const ok = results.filter((r) => r.result.status === "fulfilled").length;
-      const fail = results.length - ok;
-      if (ok > 0) toast.success(`Dismissed ${ok} job${ok === 1 ? "" : "s"}`);
-      if (fail > 0)
-        toast.error(`Failed to dismiss ${fail} job${fail === 1 ? "" : "s"}`);
-      setSelectedIDs([]);
-      queryClient.invalidateQueries({ queryKey: ["jobs"] });
-    },
-    onError: (err) => toast.error(err?.message || "Dismiss failed")
-  });
-
-  const handleDismiss = () => {
-    if (selectedIDs.length === 0) return;
-    dismissMutation.mutate(selectedIDs);
-  };
-
-  const drawerOpen = Boolean(selectedJobID);
 
   return (
     <div className="mx-auto max-w-[1800px] space-y-6 px-4 py-6 lg:px-6">
@@ -166,10 +104,10 @@ function JobsPageInner() {
 
       <div className="overflow-hidden rounded-lg border border-border bg-card">
         <BulkDismissBar
-          selectedCount={selectedIDs.length}
-          isPending={dismissMutation.isPending}
-          onDismiss={handleDismiss}
-          onClear={() => setSelectedIDs([])}
+          selectedCount={bulk.selectedIDs.length}
+          isPending={bulk.isPending}
+          onDismiss={bulk.dismiss}
+          onClear={bulk.clear}
         />
         <JobsTable
           jobs={visibleJobs}
@@ -177,10 +115,10 @@ function JobsPageInner() {
           isError={jobsQuery.isError}
           error={jobsQuery.error}
           selectedJobID={selectedJobID}
-          onOpenJob={(id) => setSelectedJobID(id)}
-          selectedIDs={selectedIDs}
-          onToggleRow={toggleRow}
-          onToggleAll={toggleAll}
+          onOpenJob={setSelectedJobID}
+          selectedIDs={bulk.selectedIDs}
+          onToggleRow={bulk.toggleRow}
+          onToggleAll={bulk.toggleAll}
         />
         <PaginationFooter
           page={page}
@@ -196,7 +134,7 @@ function JobsPageInner() {
 
       <JobDetailDrawer
         jobID={selectedJobID}
-        open={drawerOpen}
+        open={Boolean(selectedJobID)}
         onOpenChange={(open) => {
           if (!open) setSelectedJobID(null);
         }}

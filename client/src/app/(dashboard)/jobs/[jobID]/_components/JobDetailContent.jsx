@@ -6,38 +6,9 @@
 // Detail page and the Jobs drawer render this component.
 
 import { useQuery } from "@tanstack/react-query";
-import { formatDistanceToNow } from "date-fns";
+import StatusPill from "@/app/(dashboard)/jobs/_components/StatusPill";
+import { getRelativeTime } from "@/app/(dashboard)/jobs/_utils/relativeTime";
 import { ACTIVE_STATUSES, getJob, getJobLogs } from "@/lib/sepex";
-
-const STATUS_TONE = {
-  successful: "bg-status-successful text-white",
-  failed: "bg-status-failed text-white",
-  running: "bg-status-running text-white",
-  accepted: "bg-status-accepted text-white",
-  dismissed: "border border-status-dismissed text-status-dismissed",
-  lost: "border border-status-lost text-status-lost"
-};
-
-function StatusPill({ status }) {
-  return (
-    <span
-      className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-        STATUS_TONE[status] || "bg-muted text-muted-foreground"
-      }`}
-    >
-      {status}
-    </span>
-  );
-}
-
-function formatRelative(dateString) {
-  if (!dateString) return "";
-  try {
-    return `${formatDistanceToNow(new Date(dateString))} ago`;
-  } catch {
-    return dateString;
-  }
-}
 
 export default function JobDetailContent({ jobID }) {
   const jobQuery = useQuery({
@@ -98,7 +69,7 @@ export default function JobDetailContent({ jobID }) {
         <div className="flex items-center gap-3">
           <StatusPill status={job.status} />
           <span className="text-xs text-muted-foreground">
-            updated {formatRelative(job.updated)}
+            updated {getRelativeTime(job.updated)}
           </span>
         </div>
         <div className="space-y-1">

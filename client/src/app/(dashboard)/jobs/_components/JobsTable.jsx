@@ -1,21 +1,12 @@
 "use client";
 
-import { formatDistanceToNow } from "date-fns";
 import JobIdLink from "@/app/(dashboard)/jobs/_components/JobIdLink";
 import StatusPill from "@/app/(dashboard)/jobs/_components/StatusPill";
 import getRunName from "@/app/(dashboard)/jobs/_utils/getRunName";
+import { getRelativeTime } from "@/app/(dashboard)/jobs/_utils/relativeTime";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ACTIVE_STATUSES } from "@/lib/sepex";
-
-function relative(updated) {
-  if (!updated) return "—";
-  try {
-    return `${formatDistanceToNow(new Date(updated))} ago`;
-  } catch {
-    return updated;
-  }
-}
 
 function TagChip({ tag }) {
   return (
@@ -145,7 +136,7 @@ export default function JobsTable({
                       job.updated ? new Date(job.updated).toUTCString() : ""
                     }
                   >
-                    {relative(job.updated)}
+                    {getRelativeTime(job.updated)}
                   </td>
                   <td className="p-2">
                     <div className="flex flex-wrap gap-1">
@@ -185,7 +176,7 @@ export default function JobsTable({
                   <StatusPill status={job.status} />
                 </div>
                 <span className="text-xs text-muted-foreground">
-                  {relative(job.updated)}
+                  {getRelativeTime(job.updated)}
                 </span>
               </div>
               <div className="mb-1">
