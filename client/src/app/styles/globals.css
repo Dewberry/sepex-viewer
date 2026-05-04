@@ -3,9 +3,106 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── Light mode (default) ───────────────────────────────────── */
+:root {
+  --font-size: 16px;
+
+  --dewberry-magenta: #7a1341;
+  --dewberry-teal: #336b87;
+  --dewberry-charcoal: #2c2924;
+
+  --status-successful: #22c55e;
+  --status-running: #eab308;
+  --status-accepted: #0ea5e9;
+  --status-failed: #ef4444;
+  --status-dismissed: #64748b;
+  --status-lost: #a855f7;
+
+  --background: #fafaf9;
+  --foreground: #1c1917;
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  --popover: #ffffff;
+  --popover-foreground: #1c1917;
+  --primary: var(--dewberry-magenta);
+  --primary-foreground: #ffffff;
+  --secondary: var(--dewberry-teal);
+  --secondary-foreground: #ffffff;
+  --muted: #f5f5f4;
+  --muted-foreground: #78716c;
+  --accent: #f5f5f4;
+  --accent-foreground: #1c1917;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e7e5e4;
+  --input: #e7e5e4;
+  --input-background: #ffffff;
+  --switch-background: #d6d3d1;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: var(--dewberry-teal);
+
+  /* Chart colors — unified to hex (Make's :root used OKLCH; .dark used hex) */
+  --chart-1: #0ea5e9;
+  --chart-2: #22c55e;
+  --chart-3: #eab308;
+  --chart-4: #a855f7;
+  --chart-5: #ef4444;
+
+  --radius: 0.5rem;
+
+  --sidebar: #fafaf9;
+  --sidebar-foreground: #1c1917;
+  --sidebar-primary: var(--dewberry-magenta);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f5f5f4;
+  --sidebar-accent-foreground: #1c1917;
+  --sidebar-border: #e7e5e4;
+  --sidebar-ring: var(--dewberry-teal);
+}
+
+/* ── Dark mode ──────────────────────────────────────────────── */
+.dark {
+  --background: #0a0a0a;
+  --foreground: #fafaf9;
+  --card: var(--dewberry-charcoal);
+  --card-foreground: #fafaf9;
+  --popover: var(--dewberry-charcoal);
+  --popover-foreground: #fafaf9;
+  --primary: var(--dewberry-magenta);
+  --primary-foreground: #ffffff;
+  --secondary: var(--dewberry-teal);
+  --secondary-foreground: #ffffff;
+  --muted: #292524;
+  --muted-foreground: #a8a29e;
+  --accent: #292524;
+  --accent-foreground: #fafaf9;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #44403c;
+  --input: #292524;
+  --ring: var(--dewberry-teal);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+
+  --chart-1: #0ea5e9;
+  --chart-2: #22c55e;
+  --chart-3: #eab308;
+  --chart-4: #a855f7;
+  --chart-5: #ef4444;
+
+  --sidebar: #1c1917;
+  --sidebar-foreground: #fafaf9;
+  --sidebar-primary: var(--dewberry-magenta);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #292524;
+  --sidebar-accent-foreground: #fafaf9;
+  --sidebar-border: #44403c;
+  --sidebar-ring: var(--dewberry-teal);
+}
+
 /* ── Tailwind v4 theme ──────────────────────────────────────── */
 @theme inline {
-  /* shadcn semantic colors → CSS variable references */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -24,6 +121,8 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
   --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -31,21 +130,12 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  /* Brand color direct-access utilities (bg-dewberry, text-cta, etc.) */
-  --color-dewberry: #7a1341;
-  --color-dewberry-light: #9c3562;
-  --color-dewberry-dark: #5a0e30;
-  --color-cta: #336b87;
-  --color-cta-light: #457a97;
-  --color-cta-dark: #2a5674;
-  --color-charcoal: #2c2924;
-  --color-charcoal-light: #3d3a35;
-  --color-charcoal-dark: #1a1816;
-  --color-error: #8b2e40;
-  --color-error-light: #a65366;
-  --color-error-dark: #6d1e30;
+  /* Brand colors as Tailwind tokens (text-dewberry-magenta etc.) */
+  --color-dewberry-magenta: var(--dewberry-magenta);
+  --color-dewberry-teal: var(--dewberry-teal);
+  --color-dewberry-charcoal: var(--dewberry-charcoal);
 
-  /* Sepex job-status semantic colors (used by status pills, charts) */
+  /* Sepex job-status semantic colors */
   --color-status-successful: var(--status-successful);
   --color-status-running: var(--status-running);
   --color-status-accepted: var(--status-accepted);
@@ -53,115 +143,24 @@
   --color-status-dismissed: var(--status-dismissed);
   --color-status-lost: var(--status-lost);
 
-  /* Radii */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  /* Font families */
-  --font-sans: var(--font-open-sans), "Open Sans", "Helvetica", "Arial",
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-sans: var(--font-open-sans), "Open Sans", system-ui, -apple-system,
     sans-serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono",
-    "Menlo", monospace;
-}
-
-/* ── Light mode (default) ───────────────────────────────────── */
-:root {
-  --radius: 0.5rem;
-
-  --background: #ffffff;
-  --foreground: #0a0a0a;
-
-  --card: #ffffff;
-  --card-foreground: #0a0a0a;
-
-  --popover: #ffffff;
-  --popover-foreground: #0a0a0a;
-
-  /* Primary = Dewberry #7A1341 */
-  --primary: #7a1341;
-  --primary-foreground: #ffffff;
-
-  --secondary: #f5f5f4;
-  --secondary-foreground: #1c1917;
-
-  --muted: #f5f5f4;
-  --muted-foreground: #78716c;
-
-  --accent: #f5f5f4;
-  --accent-foreground: #1c1917;
-
-  /* Destructive = Error #8B2E40 */
-  --destructive: #8b2e40;
-  --destructive-foreground: #ffffff;
-
-  --border: #e7e5e4;
-  --input: #e7e5e4;
-
-  /* Ring = CTA teal #336B87 */
-  --ring: #336b87;
-
-  /* Charts — Dewberry palette */
-  --chart-1: #7a1341;
-  --chart-2: #336b87;
-  --chart-3: #a8a29e;
-  --chart-4: #457a97;
-  --chart-5: #8b2e40;
-
-  /* Job-status colors (Sepex) */
-  --status-successful: #22c55e;
-  --status-running: #eab308;
-  --status-accepted: #0ea5e9;
-  --status-failed: #ef4444;
-  --status-dismissed: #64748b;
-  --status-lost: #a855f7;
-}
-
-/* ── Dark mode ──────────────────────────────────────────────── */
-.dark {
-  --background: #0a0a0a;
-  --foreground: #fafafa;
-
-  --card: #0a0a0a;
-  --card-foreground: #fafafa;
-
-  --popover: #0a0a0a;
-  --popover-foreground: #fafafa;
-
-  --primary: #7a1341;
-  --primary-foreground: #ffffff;
-
-  --secondary: #262626;
-  --secondary-foreground: #fafafa;
-
-  --muted: #262626;
-  --muted-foreground: #a1a1aa;
-
-  --accent: #262626;
-  --accent-foreground: #fafafa;
-
-  --destructive: #8b2e40;
-  --destructive-foreground: #ffffff;
-
-  --border: #262626;
-  --input: #262626;
-
-  --ring: #336b87;
-
-  --chart-1: #7a1341;
-  --chart-2: #336b87;
-  --chart-3: #a1a1aa;
-  --chart-4: #457a97;
-  --chart-5: #8b2e40;
-
-  /* Job-status colors — slightly brighter in dark */
-  --status-successful: #4ade80;
-  --status-running: #facc15;
-  --status-accepted: #38bdf8;
-  --status-failed: #f87171;
-  --status-dismissed: #94a3b8;
-  --status-lost: #c084fc;
+  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace,
+    "SF Mono", Menlo, monospace;
 }
 
 /* ── Base layer ─────────────────────────────────────────────── */
@@ -178,24 +177,7 @@
     @apply bg-background text-foreground;
   }
 
-  /* Brand-colored text selection */
   ::selection {
-    background-color: color-mix(in srgb, #336b87 25%, transparent);
-  }
-
-  /* Subtle scrollbar styling */
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.15);
-    border-radius: 3px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: color-mix(in srgb, var(--dewberry-teal) 25%, transparent);
   }
 }

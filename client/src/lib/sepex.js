@@ -18,7 +18,9 @@
  */
 
 const DEFAULT_BASE_URL =
-  process.env.NEXT_PUBLIC_SEPEX_BASE_URL || "http://localhost:5050";
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.NEXT_PUBLIC_SEPEX_BASE_URL ||
+  "http://localhost:5050";
 
 const DEFAULT_USER_EMAIL =
   process.env.NEXT_PUBLIC_SEPEX_USER_EMAIL || "dev@dewberry.local";

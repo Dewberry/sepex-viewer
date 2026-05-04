@@ -106,7 +106,7 @@ What we want from Grafana:
 ### What to avoid
 - The "AI dashboard" cliché: pastel gradients, glassmorphism cards, generic illustration with floating dots.
 - Excessive iconography. Use icons to *replace* text only when the icon is universally understood (search, settings, close, chevron). Pair icons with labels otherwise.
-- Light, spacious "consumer" feel. This is an internal tool used 4–8 hours a day. Density matters. Pack information.
+- Light, spacious "consumer" feel. This is a daily-driver tool used 4–8 hours a day. Density matters. Pack information.
 
 ### Brand palette (from `/Users/curtis/Documents/code/reality-view/client/src/app/styles/globals.css`)
 
@@ -226,7 +226,7 @@ Streamlit's hamburger menu in production gives users: System/Light/Dark, Clear C
    - Pulls from `GET /admin/resources` (no auth required if `AUTH_LEVEL ≤ 1`): "API online · 3 jobs running · 47% CPU · v2025.11.0-beta". Green dot if healthy.
 
 4. **Footer**
-   - Dewberry wordmark, internal-tool notice ("Internal use only"), link to the GitHub repo.
+   - Dewberry · Resilience Solutions wordmark, "Open Source" tag, link to the GitHub repo.
 
 **Tone**: Confident, technical. Not marketing-speak. This is for engineers signing into their own tool, not customers being persuaded.
 
