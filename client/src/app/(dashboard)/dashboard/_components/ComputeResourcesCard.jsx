@@ -103,7 +103,7 @@ export default function ComputeResourcesCard({
             unit=""
             usedPct={data?.usedCPUsPct}
             queuedPct={data?.queuedCPUsPct}
-            accentVar="--status-accepted"
+            accentVar="--chart-1"
           />
           <Gauge
             icon={<MemoryStick className="h-4 w-4" />}
@@ -113,7 +113,7 @@ export default function ComputeResourcesCard({
             unit="GB"
             usedPct={data?.usedMemPct}
             queuedPct={data?.queuedMemPct}
-            accentVar="--status-lost"
+            accentVar="--chart-4"
           />
         </div>
       )}

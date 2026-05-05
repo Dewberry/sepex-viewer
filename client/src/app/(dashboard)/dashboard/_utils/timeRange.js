@@ -1,10 +1,6 @@
-export const TIME_RANGES = ["24h", "7d", "30d"];
+import { startOfDay, startOfHour } from "date-fns";
 
-export const TIME_RANGE_LABELS = {
-  "24h": "24h",
-  "7d": "7d",
-  "30d": "30d"
-};
+export const TIME_RANGES = ["24h", "7d", "30d"];
 
 // Picks a `limit` for the single /jobs fetch that powers KPIs/charts/activity.
 // Larger windows fetch more rows but the API has no `?updatedAfter` yet, so
@@ -15,15 +11,22 @@ export function getJobsLimitForRange(range) {
   return 200;
 }
 
-// Hours / days of lookback for client-side windowing.
+// Start of the windowed range, snapped to the first bucket boundary the chart
+// uses (24h → 24 hourly buckets ending now; 7d/30d → daily buckets ending
+// today). Keeping KPIs and the chart on the same window means a job either
+// shows up in both or neither — no silent dropping at the edge.
 export function getRangeStart(range, now = new Date()) {
-  const start = new Date(now);
   if (range === "30d") {
-    start.setDate(start.getDate() - 30);
-  } else if (range === "7d") {
-    start.setDate(start.getDate() - 7);
-  } else {
-    start.setHours(start.getHours() - 24);
+    const d = new Date(now);
+    d.setDate(d.getDate() - 29);
+    return startOfDay(d);
   }
-  return start;
+  if (range === "7d") {
+    const d = new Date(now);
+    d.setDate(d.getDate() - 6);
+    return startOfDay(d);
+  }
+  const d = new Date(now);
+  d.setHours(d.getHours() - 23);
+  return startOfHour(d);
 }

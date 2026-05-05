@@ -60,8 +60,11 @@ export default function RecentActivityFeed({
               >
                 <StatusPill status={job.status} />
                 <div className="min-w-0 flex-1">
-                  <div className="truncate font-mono text-sm font-medium">
-                    {job.jobID}
+                  <div
+                    className="truncate font-mono text-sm font-medium"
+                    title={job.jobID}
+                  >
+                    {(job.jobID || "").slice(-8)}
                   </div>
                   <div className="truncate text-xs text-muted-foreground">
                     {job.processID || "—"}
