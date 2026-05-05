@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Activity } from "lucide-react";
-import CommandPaletteButton from "./CommandPaletteButton";
-import MobileNav from "./MobileNav";
-import ThemeToggle from "./ThemeToggle";
-import UserPopover from "./UserPopover";
+import CommandPaletteButton from "@/app/_components/CommandPaletteButton";
+import MobileNav from "@/app/_components/MobileNav";
+import ThemeToggle from "@/app/_components/ThemeToggle";
+import UserPopover from "@/app/_components/UserPopover";
 import { Separator } from "@/components/ui/separator";
 
 const navItems = [
