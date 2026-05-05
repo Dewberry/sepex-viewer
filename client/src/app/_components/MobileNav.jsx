@@ -1,10 +1,5 @@
 import Link from "next/link";
-
-const navItems = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/builder", label: "Builder" },
-  { href: "/jobs", label: "Jobs" }
-];
+import { navItems } from "@/app/_components/navItems";
 
 export default function MobileNav() {
   return (

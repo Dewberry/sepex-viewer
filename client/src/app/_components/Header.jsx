@@ -2,15 +2,10 @@ import Link from "next/link";
 import { Activity } from "lucide-react";
 import CommandPaletteButton from "@/app/_components/CommandPaletteButton";
 import MobileNav from "@/app/_components/MobileNav";
+import { navItems } from "@/app/_components/navItems";
 import ThemeToggle from "@/app/_components/ThemeToggle";
 import UserPopover from "@/app/_components/UserPopover";
 import { Separator } from "@/components/ui/separator";
-
-const navItems = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/builder", label: "Builder" },
-  { href: "/jobs", label: "Jobs" }
-];
 
 export default function Header() {
   return (
