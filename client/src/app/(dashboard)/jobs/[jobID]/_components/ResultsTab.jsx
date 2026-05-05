@@ -1,0 +1,94 @@
+"use client";
+
+import { Download } from "lucide-react";
+import useJobResultsQuery from "@/app/(dashboard)/jobs/[jobID]/_hooks/useJobResultsQuery";
+import { Button } from "@/components/ui/button";
+
+// The Sepex API returns results in one of two shapes depending on the OGC
+// negotiation: a flat array of { id|name, href, mediaType } or an object map
+// keyed by output name. Normalize defensively so the UI doesn't care.
+function normalizeResults(data) {
+  if (!data) return [];
+  if (Array.isArray(data)) {
+    return data
+      .map((entry) => ({
+        name: entry.id || entry.name || entry.key || "(unnamed)",
+        href: entry.href || entry.value?.href,
+        type:
+          entry.mediaType ||
+          entry.type ||
+          entry.value?.mediaType ||
+          entry.value?.type
+      }))
+      .filter((e) => e.href || e.type);
+  }
+  if (typeof data === "object") {
+    return Object.entries(data).map(([name, value]) => ({
+      name,
+      href: value?.href,
+      type: value?.mediaType || value?.type
+    }));
+  }
+  return [];
+}
+
+export default function ResultsTab({ jobID, jobStatus }) {
+  const { data, isLoading, isError, error } = useJobResultsQuery(jobID);
+
+  if (isLoading) {
+    return (
+      <div className="text-sm text-muted-foreground">Loading results…</div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+        Couldn&rsquo;t load results:{" "}
+        <span className="font-mono">{error?.message}</span>
+      </div>
+    );
+  }
+
+  const entries = normalizeResults(data);
+
+  if (entries.length === 0) {
+    return (
+      <div className="rounded-md border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+        {jobStatus === "successful"
+          ? "Job completed but produced no outputs."
+          : "Job hasn’t produced results yet."}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {entries.map((entry) => (
+        <div
+          key={entry.name}
+          className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 p-4 transition-colors hover:bg-muted/50"
+        >
+          <div className="min-w-0 flex-1">
+            <div className="font-semibold">{entry.name}</div>
+            {entry.href ? (
+              <div className="truncate font-mono text-xs text-muted-foreground">
+                {entry.href}
+              </div>
+            ) : null}
+            {entry.type ? (
+              <div className="text-xs text-muted-foreground">{entry.type}</div>
+            ) : null}
+          </div>
+          {entry.href ? (
+            <Button asChild variant="ghost" size="sm" title="Open / download">
+              <a href={entry.href} target="_blank" rel="noreferrer noopener">
+                <Download className="h-4 w-4" />
+              </a>
+            </Button>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+}
