@@ -146,7 +146,7 @@ export default function LogsTab({ jobID, jobStatus }) {
                 className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
                   active
                     ? "bg-accent text-accent-foreground"
-                    : "bg-muted text-muted-foreground/60 hover:bg-muted/80"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
                 }`}
                 aria-pressed={active}
               >

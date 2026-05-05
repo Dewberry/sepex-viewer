@@ -6,36 +6,51 @@ const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 const OUT_DIR = path.resolve(process.cwd(), "../research/screenshots/built");
 
 const VIEWPORT_DESKTOP = { width: 1440, height: 900 };
+const VIEWPORT_MOBILE = { width: 390, height: 844 }; // iPhone 14-class
 
 const JOB_ID = "mock-0008-ras-2d-mesh"; // a successful job in the mock seed
 
-const SHOTS = [
-  { name: "landing-light", path: "/", theme: "light" },
-  { name: "landing-dark", path: "/", theme: "dark" },
-  { name: "dashboard-light", path: "/dashboard", theme: "light" },
-  { name: "dashboard-dark", path: "/dashboard", theme: "dark" },
+const PAGES = [
+  { id: "landing", path: "/" },
+  { id: "dashboard", path: "/dashboard" },
+  { id: "builder", path: "/builder", selectProcess: true },
+  { id: "jobs", path: "/jobs" },
   {
-    name: "builder-light",
-    path: "/builder",
-    theme: "light",
-    selectProcess: true
-  },
-  {
-    name: "builder-dark",
-    path: "/builder",
-    theme: "dark",
-    selectProcess: true
-  },
-  { name: "jobs-light", path: "/jobs", theme: "light" },
-  { name: "jobs-dark", path: "/jobs", theme: "dark" },
-  {
-    name: "jobs-drawer-open-dark",
+    id: "jobs-drawer-open",
     path: `/jobs?selected=${JOB_ID}`,
-    theme: "dark"
+    onlyTheme: "dark",
+    onlyDevice: "desktop"
   },
-  { name: "job-detail-light", path: `/jobs/${JOB_ID}`, theme: "light" },
-  { name: "job-detail-dark", path: `/jobs/${JOB_ID}`, theme: "dark" }
+  { id: "job-detail", path: `/jobs/${JOB_ID}` }
 ];
+
+const THEMES = ["light", "dark"];
+const DEVICES = [
+  { id: "desktop", viewport: VIEWPORT_DESKTOP, suffix: "" },
+  { id: "mobile", viewport: VIEWPORT_MOBILE, suffix: "-mobile" }
+];
+
+function buildShots() {
+  const shots = [];
+  for (const p of PAGES) {
+    for (const device of DEVICES) {
+      if (p.onlyDevice && p.onlyDevice !== device.id) continue;
+      for (const theme of THEMES) {
+        if (p.onlyTheme && p.onlyTheme !== theme) continue;
+        shots.push({
+          name: `${p.id}${device.suffix}-${theme}`,
+          path: p.path,
+          theme,
+          viewport: device.viewport,
+          selectProcess: p.selectProcess
+        });
+      }
+    }
+  }
+  return shots;
+}
+
+const SHOTS = buildShots();
 
 async function applyTheme(page, theme) {
   await page.evaluate((t) => {
@@ -46,18 +61,17 @@ async function applyTheme(page, theme) {
 }
 
 async function captureOne(browser, shot) {
-  const context = await browser.newContext({ viewport: VIEWPORT_DESKTOP });
+  const context = await browser.newContext({ viewport: shot.viewport });
   const page = await context.newPage();
 
-  // First load the app at root so localStorage is on the right origin, set theme, then nav.
   await page.goto(BASE_URL, { waitUntil: "domcontentloaded" });
   await applyTheme(page, shot.theme);
-  await page.goto(`${BASE_URL}${shot.path}`, { waitUntil: "domcontentloaded" });
-  // Polling means networkidle may never settle. Wait a fixed budget for data.
+  await page.goto(`${BASE_URL}${shot.path}`, {
+    waitUntil: "domcontentloaded"
+  });
   await page.waitForTimeout(2500);
 
   if (shot.selectProcess) {
-    // Click the process picker, pick the first option (RAS 2D Mesh Build).
     await page
       .getByRole("button", { name: /select a process/i })
       .click()
@@ -69,16 +83,6 @@ async function captureOne(browser, shot) {
       .first();
     await firstOption.click({ timeout: 2000 }).catch(() => {});
     await page.waitForTimeout(1500);
-  }
-
-  if (shot.drawer) {
-    const firstJobIdButton = page
-      .locator("table tbody tr")
-      .first()
-      .locator("button, a")
-      .first();
-    await firstJobIdButton.click({ trial: false }).catch(() => {});
-    await page.waitForTimeout(1000);
   }
 
   const target = path.join(OUT_DIR, `${shot.name}.png`);

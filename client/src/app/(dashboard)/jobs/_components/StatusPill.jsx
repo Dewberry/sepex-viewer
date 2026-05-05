@@ -1,10 +1,14 @@
+// Bright status colors get black text for WCAG AA (white only hits 1.9–3.8:1
+// on these greens / yellows / reds / blues). Outlined pills use a darker
+// shade for text since the pure status color fails AA on light surfaces.
 const STATUS_TONE = {
-  successful: "bg-status-successful text-white",
-  failed: "bg-status-failed text-white",
-  running: "bg-status-running text-white",
-  accepted: "bg-status-accepted text-white",
-  dismissed: "border border-status-dismissed text-status-dismissed",
-  lost: "border border-status-lost text-status-lost"
+  successful: "bg-status-successful text-black",
+  failed: "bg-status-failed text-black",
+  running: "bg-status-running text-black",
+  accepted: "bg-status-accepted text-black",
+  dismissed:
+    "border border-status-dismissed text-slate-700 dark:text-slate-300",
+  lost: "border border-status-lost text-purple-700 dark:text-purple-300"
 };
 
 export default function StatusPill({ status }) {

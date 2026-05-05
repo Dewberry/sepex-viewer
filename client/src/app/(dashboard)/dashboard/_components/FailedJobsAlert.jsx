@@ -115,7 +115,7 @@ export default function FailedJobsAlert({ jobs, isLoading, isError }) {
         </p>
         <Link
           href="/jobs?status=failed"
-          className="inline-flex items-center gap-1 text-xs text-status-failed hover:underline"
+          className="inline-flex items-center gap-1 text-xs text-red-700 hover:underline dark:text-red-400"
         >
           View all failures
           <ArrowRight className="h-3 w-3" />
