@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import JobDetailContent from "@/app/(dashboard)/jobs/[jobID]/_components/JobDetailContent";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle
+} from "@/components/ui/sheet";
 
 export default function JobDetailDrawer({ jobID, open, onOpenChange }) {
   return (
@@ -13,6 +18,10 @@ export default function JobDetailDrawer({ jobID, open, onOpenChange }) {
         className="flex w-full flex-col gap-0 p-0 sm:max-w-[720px]"
       >
         <SheetTitle className="sr-only">Job details</SheetTitle>
+        <SheetDescription className="sr-only">
+          Logs, results, metadata, and inputs for this job. Use the link above
+          to open the full page.
+        </SheetDescription>
         {jobID ? (
           <>
             <div className="flex items-center justify-between border-b border-border px-4 py-3">

@@ -1,27 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Copy, Server } from "lucide-react";
 import { toast } from "sonner";
 import DismissJobButton from "@/app/(dashboard)/jobs/[jobID]/_components/DismissJobButton";
 import StatusIcon from "@/app/(dashboard)/jobs/[jobID]/_components/StatusIcon";
-import { formatElapsed } from "@/app/(dashboard)/jobs/[jobID]/_utils/formatElapsed";
+import { getElapsed } from "@/app/(dashboard)/jobs/_utils/elapsed";
 import { getRelativeTime } from "@/app/(dashboard)/jobs/_utils/relativeTime";
 import { ACTIVE_STATUSES } from "@/lib/sepex";
 
 export default function RunSummaryCard({ job }) {
   const isActive = ACTIVE_STATUSES.has(job.status);
-
-  // While the job is active, advance the elapsed clock once a second so users
-  // see the timer move even between the 2s status polls.
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    if (!isActive) return undefined;
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, [isActive]);
-
-  const elapsedEnd = isActive ? new Date(now).toISOString() : job.updated;
 
   const handleCopy = async () => {
     try {
@@ -87,9 +75,7 @@ export default function RunSummaryCard({ job }) {
             <div className="text-xs tracking-wider text-muted-foreground uppercase">
               Elapsed
             </div>
-            <div className="font-mono">
-              {formatElapsed(job.created, elapsedEnd)}
-            </div>
+            <div className="font-mono">{getElapsed(job)}</div>
           </div>
           <div>
             <div className="text-xs tracking-wider text-muted-foreground uppercase">

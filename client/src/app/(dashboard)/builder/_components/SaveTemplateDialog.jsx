@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle
@@ -43,6 +44,9 @@ export default function SaveTemplateDialog({ open, onOpenChange, onSave }) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Save Template</DialogTitle>
+          <DialogDescription>
+            Saved in your browser. Other devices won&rsquo;t see these.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
           <label className="block text-sm font-medium">Template name</label>
@@ -62,9 +66,6 @@ export default function SaveTemplateDialog({ open, onOpenChange, onSave }) {
             autoFocus
           />
           {error && <p className="text-xs text-status-failed">{error}</p>}
-          <p className="text-xs italic text-muted-foreground">
-            Saved in your browser. Other devices won&rsquo;t see these.
-          </p>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => handleOpenChange(false)}>

@@ -1,16 +1,5 @@
 "use client";
 
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis
-} from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const STACKS = [
@@ -20,107 +9,72 @@ const STACKS = [
   { key: "accepted", color: "var(--status-accepted)", label: "Accepted" }
 ];
 
-function ChartTooltip({ active, payload, label }) {
-  if (!active || !payload || payload.length === 0) return null;
-  const inProgress = payload[0]?.payload?.inProgress;
-  return (
-    <div className="rounded-md border border-border bg-popover px-3 py-2 text-xs shadow-md">
-      <div className="mb-1 flex items-center gap-2 font-mono text-popover-foreground">
-        <span>{label}</span>
-        {inProgress ? (
-          <span className="text-[10px] text-muted-foreground">
-            (in progress)
-          </span>
-        ) : null}
-      </div>
-      {payload
-        .filter((p) => p.value > 0)
-        .map((p) => (
-          <div key={p.dataKey} className="flex items-center gap-2">
-            <span
-              className="h-2 w-2 rounded-sm"
-              style={{ backgroundColor: p.color }}
-            />
-            <span className="text-muted-foreground capitalize">{p.name}</span>
-            <span className="ml-auto font-medium text-popover-foreground">
-              {p.value}
-            </span>
-          </div>
-        ))}
-    </div>
-  );
-}
-
 export default function JobsOverTimeChart({ data, isLoading, isError }) {
   return (
     <div className="rounded-lg border border-border bg-card p-4">
       <h3 className="mb-4 font-semibold">Jobs Over Time</h3>
-      <div className="h-64 w-full">
-        {isLoading ? (
-          <Skeleton className="h-full w-full rounded-md" />
-        ) : isError ? (
-          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-            Couldn&rsquo;t load jobs.
-          </div>
-        ) : data.length === 0 ? (
-          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-            No jobs in this window.
-          </div>
-        ) : (
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={data}
-              margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
-            >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="var(--border)"
-                vertical={false}
-              />
-              <XAxis
-                dataKey="label"
-                tickLine={false}
-                axisLine={false}
-                tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
-              />
-              <YAxis
-                tickLine={false}
-                axisLine={false}
-                allowDecimals={false}
-                tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
-                width={28}
-              />
-              <Tooltip
-                cursor={{ fill: "var(--muted)", opacity: 0.4 }}
-                content={<ChartTooltip />}
-              />
-              <Legend
-                iconSize={10}
-                wrapperStyle={{
-                  fontSize: 11,
-                  color: "var(--muted-foreground)"
-                }}
-              />
-              {STACKS.map((s) => (
-                <Bar
-                  key={s.key}
-                  dataKey={s.key}
-                  name={s.label}
-                  stackId="status"
-                  fill={s.color}
+      {isLoading ? (
+        <Skeleton className="h-64 w-full rounded-md" />
+      ) : isError ? (
+        <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
+          Couldn&rsquo;t load jobs.
+        </div>
+      ) : data.length === 0 ? (
+        <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
+          No jobs in this window.
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {data.map((bucket) => {
+            const total = STACKS.reduce(
+              (sum, s) => sum + (bucket[s.key] || 0),
+              0
+            );
+            return (
+              <div key={bucket.key} className="flex items-center gap-3">
+                <div className="w-12 font-mono text-xs text-muted-foreground">
+                  {bucket.label}
+                </div>
+                <div
+                  className={`flex h-6 flex-1 overflow-hidden rounded ${
+                    bucket.inProgress ? "opacity-60" : ""
+                  } ${total === 0 ? "bg-muted" : ""}`}
                 >
-                  {data.map((entry) => (
-                    <Cell
-                      key={entry.key}
-                      fillOpacity={entry.inProgress ? 0.5 : 1}
-                    />
-                  ))}
-                </Bar>
-              ))}
-            </BarChart>
-          </ResponsiveContainer>
-        )}
-      </div>
+                  {STACKS.map((s) => {
+                    const value = bucket[s.key] || 0;
+                    if (value === 0 || total === 0) return null;
+                    return (
+                      <div
+                        key={s.key}
+                        className="transition-opacity hover:opacity-80"
+                        style={{
+                          width: `${(value / total) * 100}%`,
+                          backgroundColor: s.color
+                        }}
+                        title={`${s.label}: ${value}`}
+                      />
+                    );
+                  })}
+                </div>
+                <div className="w-8 text-right text-xs text-muted-foreground">
+                  {total}
+                </div>
+              </div>
+            );
+          })}
+          <div className="flex flex-wrap items-center gap-3 pt-2 text-xs">
+            {STACKS.map((s) => (
+              <div key={s.key} className="flex items-center gap-1.5">
+                <div
+                  className="h-3 w-3 rounded-sm"
+                  style={{ backgroundColor: s.color }}
+                />
+                <span className="text-muted-foreground">{s.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

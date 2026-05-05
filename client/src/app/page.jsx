@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Activity,
@@ -9,14 +10,12 @@ import {
   Sun,
   Terminal
 } from "lucide-react";
-import { signIn } from "next-auth/react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 
 const SPARK_BARS = [3, 4, 5, 7, 6, 8, 9, 7, 10, 11, 9, 12, 11, 13, 14, 15];
 const SPARK_MAX = 15;
 
-const isDevBypass = process.env.NEXT_PUBLIC_DEV_BYPASS_AUTH === "true";
 const apiDocsUrl =
   process.env.NEXT_PUBLIC_API_DOCS_URL ||
   `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050"}/api`;
@@ -97,6 +96,11 @@ function LogTailCard() {
 
 function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
+  // Defer theme-dependent rendering until after hydration. The server can't
+  // know the user's stored preference, so until we mount we treat every option
+  // as inactive — matches the SSR output and avoids an aria-pressed mismatch.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const options = [
     { id: "light", label: "Light mode", icon: Sun },
     { id: "dark", label: "Dark mode", icon: Moon },
@@ -107,7 +111,7 @@ function ThemeSwitcher() {
       <span>Theme:</span>
       <div className="flex gap-1 rounded-lg bg-muted p-1">
         {options.map(({ id, label, icon: Icon }) => {
-          const active = theme === id;
+          const active = mounted && theme === id;
           return (
             <button
               key={id}
@@ -134,13 +138,9 @@ function ThemeSwitcher() {
 export default function LandingPage() {
   const router = useRouter();
 
-  const handleSignIn = () => {
-    if (isDevBypass) {
-      router.push("/dashboard");
-      return;
-    }
-    signIn(undefined, { callbackUrl: "/dashboard" });
-  };
+  // Auth is intentionally off for v1 — Sign in just routes into the app.
+  // See research/todo.md for the wire-up-real-auth follow-up.
+  const handleSignIn = () => router.push("/dashboard");
 
   return (
     <div className="flex min-h-screen flex-col">
