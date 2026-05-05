@@ -17,7 +17,8 @@ export default function JobsFilterBar({
   filters,
   onChange,
   processes,
-  processesLoading
+  processesLoading,
+  searchInputRef
 }) {
   const update = (patch) => onChange({ ...filters, ...patch });
 
@@ -27,6 +28,7 @@ export default function JobsFilterBar({
         <div className="relative lg:col-span-2">
           <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
+            ref={searchInputRef}
             type="text"
             placeholder="Search jobID or submitter…"
             value={filters.search}

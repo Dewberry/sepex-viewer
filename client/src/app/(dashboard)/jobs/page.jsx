@@ -1,6 +1,7 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import AppliedFiltersBar from "@/app/(dashboard)/jobs/_components/AppliedFiltersBar";
 import BulkDismissBar from "@/app/(dashboard)/jobs/_components/BulkDismissBar";
@@ -25,11 +26,25 @@ const EMPTY_FILTERS = {
 
 function JobsPageInner() {
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const searchInputRef = useRef(null);
   const [selectedJobID, setSelectedJobID] = useSelectedJobUrlSync();
 
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [pageSize, setPageSize] = useState(20);
   const [offset, setOffset] = useState(0);
+
+  // Auto-focus search when arriving via ⌘K (?focus=search), then strip the param.
+  useEffect(() => {
+    if (searchParams.get("focus") !== "search") return;
+    searchInputRef.current?.focus();
+    const next = new URLSearchParams(searchParams);
+    next.delete("focus");
+    const qs = next.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }, [searchParams, router, pathname]);
 
   // Reset to first page whenever a server-side filter or page size changes.
   useEffect(() => {
@@ -94,6 +109,7 @@ function JobsPageInner() {
           onChange={setFilters}
           processes={processes}
           processesLoading={processesQuery.isLoading}
+          searchInputRef={searchInputRef}
         />
         <AppliedFiltersBar
           filters={filters}
