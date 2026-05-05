@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
   Tooltip
 } from "recharts";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const PALETTE = [
   "var(--chart-1)",
@@ -32,12 +33,18 @@ function ChartTooltip({ active, payload }) {
   );
 }
 
-export default function JobsByProcessChart({ data }) {
+export default function JobsByProcessChart({ data, isLoading, isError }) {
   return (
     <div className="rounded-lg border border-border bg-card p-4">
       <h3 className="mb-4 font-semibold">Jobs by Process</h3>
       <div className="h-64 w-full">
-        {data.length === 0 ? (
+        {isLoading ? (
+          <Skeleton className="h-full w-full rounded-md" />
+        ) : isError ? (
+          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+            Couldn&rsquo;t load jobs.
+          </div>
+        ) : data.length === 0 ? (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
             No jobs in this window.
           </div>

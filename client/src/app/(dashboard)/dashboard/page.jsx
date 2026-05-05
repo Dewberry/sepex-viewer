@@ -75,8 +75,16 @@ export default function DashboardPage() {
       <KpiTiles kpis={kpis} isLoading={jobsQuery.isLoading} />
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <JobsOverTimeChart data={overTime} />
-        <JobsByProcessChart data={byProcess} />
+        <JobsOverTimeChart
+          data={overTime}
+          isLoading={jobsQuery.isLoading}
+          isError={jobsQuery.isError}
+        />
+        <JobsByProcessChart
+          data={byProcess}
+          isLoading={jobsQuery.isLoading}
+          isError={jobsQuery.isError}
+        />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -86,7 +94,11 @@ export default function DashboardPage() {
           isError={resourcesQuery.isError}
           dataUpdatedAt={resourcesQuery.dataUpdatedAt}
         />
-        <TopSubmittersChart data={bySubmitter} />
+        <TopSubmittersChart
+          data={bySubmitter}
+          isLoading={jobsQuery.isLoading}
+          isError={jobsQuery.isError}
+        />
       </div>
 
       <FailedJobsAlert

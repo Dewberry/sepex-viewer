@@ -85,6 +85,9 @@ function JobsPageInner() {
   const bulk = useBulkDismiss(visibleJobs);
 
   const hasActiveJobs = visibleJobs.some((j) => ACTIVE_STATUSES.has(j.status));
+  const hasActiveFilters = Object.entries(filters).some(([, v]) =>
+    typeof v === "string" ? v.trim() !== "" : Boolean(v)
+  );
   const hasNext = links.some((l) => l.title === "next" || l.rel === "next");
   const hasPrev = offset > 0;
   const page = Math.floor(offset / pageSize) + 1;
@@ -130,6 +133,7 @@ function JobsPageInner() {
           isLoading={jobsQuery.isLoading}
           isError={jobsQuery.isError}
           error={jobsQuery.error}
+          hasActiveFilters={hasActiveFilters}
           selectedJobID={selectedJobID}
           onOpenJob={setSelectedJobID}
           selectedIDs={bulk.selectedIDs}

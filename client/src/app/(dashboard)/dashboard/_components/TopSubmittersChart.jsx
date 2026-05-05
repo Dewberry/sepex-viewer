@@ -9,6 +9,7 @@ import {
   XAxis,
   YAxis
 } from "recharts";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function ChartTooltip({ active, payload }) {
   if (!active || !payload || payload.length === 0) return null;
@@ -23,13 +24,19 @@ function ChartTooltip({ active, payload }) {
   );
 }
 
-export default function TopSubmittersChart({ data }) {
+export default function TopSubmittersChart({ data, isLoading, isError }) {
   const height = Math.max(160, data.length * 32 + 32);
   return (
     <div className="rounded-lg border border-border bg-card p-4">
       <h3 className="mb-4 font-semibold">Top Submitters</h3>
       <div className="w-full" style={{ height }}>
-        {data.length === 0 ? (
+        {isLoading ? (
+          <Skeleton className="h-full w-full rounded-md" />
+        ) : isError ? (
+          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+            Couldn&rsquo;t load jobs.
+          </div>
+        ) : data.length === 0 ? (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
             No jobs in this window.
           </div>

@@ -8,6 +8,7 @@ import MetadataTab from "@/app/(dashboard)/jobs/[jobID]/_components/MetadataTab"
 import ResultsTab from "@/app/(dashboard)/jobs/[jobID]/_components/ResultsTab";
 import RunSummaryCard from "@/app/(dashboard)/jobs/[jobID]/_components/RunSummaryCard";
 import useJobQuery from "@/app/(dashboard)/jobs/[jobID]/_hooks/useJobQuery";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Shared content renderer for the Job Detail experience. Used by both
@@ -23,9 +24,9 @@ export default function JobDetailContent({ jobID }) {
   if (jobQuery.isLoading) {
     return (
       <div className="space-y-3">
-        <div className="h-24 animate-pulse rounded-lg bg-muted" />
-        <div className="h-9 w-64 animate-pulse rounded-lg bg-muted" />
-        <div className="h-72 animate-pulse rounded-lg bg-muted" />
+        <Skeleton className="h-24 w-full rounded-lg" />
+        <Skeleton className="h-9 w-64 rounded-lg" />
+        <Skeleton className="h-72 w-full rounded-lg" />
       </div>
     );
   }

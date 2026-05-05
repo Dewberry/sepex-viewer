@@ -21,6 +21,7 @@ export default function JobsTable({
   isLoading,
   isError,
   error,
+  hasActiveFilters,
   selectedJobID,
   onOpenJob,
   selectedIDs,
@@ -45,14 +46,19 @@ export default function JobsTable({
 
   if (isError) {
     return (
-      <div className="p-6 text-center text-sm">
+      <div className="border-b border-destructive/30 bg-destructive/5 p-3 text-sm">
         <p className="font-medium text-destructive">
           Couldn&rsquo;t reach the API
+          {error?.message ? (
+            <>
+              :{" "}
+              <span className="font-mono text-xs font-normal">
+                {error.message}
+              </span>
+            </>
+          ) : null}
         </p>
-        <p className="mt-1 font-mono text-xs text-muted-foreground">
-          {error?.message || "Unknown error"}
-        </p>
-        <p className="mt-2 text-xs text-muted-foreground">
+        <p className="mt-1 text-xs text-muted-foreground">
           Make sure the Sepex server is running at{" "}
           <span className="font-mono">
             {process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050"}
@@ -66,7 +72,9 @@ export default function JobsTable({
   if (jobs.length === 0) {
     return (
       <div className="p-10 text-center text-sm text-muted-foreground">
-        No jobs match the current filters.
+        {hasActiveFilters
+          ? "No jobs match these filters."
+          : "No jobs have been submitted yet."}
       </div>
     );
   }
