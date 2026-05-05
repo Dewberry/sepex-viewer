@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Activity } from "lucide-react";
 import CommandPaletteButton from "./CommandPaletteButton";
+import MobileNav from "./MobileNav";
 import ThemeToggle from "./ThemeToggle";
 import UserPopover from "./UserPopover";
 import { Separator } from "@/components/ui/separator";
@@ -37,6 +38,7 @@ export default function Header() {
           <UserPopover />
         </div>
       </div>
+      <MobileNav />
     </header>
   );
 }
