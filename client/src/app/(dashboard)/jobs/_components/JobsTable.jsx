@@ -1,12 +1,12 @@
 "use client";
 
 import JobIdLink from "@/app/(dashboard)/jobs/_components/JobIdLink";
-import StatusPill from "@/app/(dashboard)/jobs/_components/StatusPill";
 import getRunName from "@/app/(dashboard)/jobs/_utils/getRunName";
-import { getRelativeTime } from "@/app/(dashboard)/jobs/_utils/relativeTime";
+import StatusPill from "@/components/sepex/StatusPill";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ACTIVE_STATUSES } from "@/lib/sepex";
+import { getRelativeTime } from "@/lib/time";
 
 function TagChip({ tag }) {
   return (

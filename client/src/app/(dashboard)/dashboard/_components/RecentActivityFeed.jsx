@@ -1,33 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ArrowRight,
-  Ban,
-  CheckCircle2,
-  CircleHelp,
-  Clock,
-  Loader2,
-  XCircle
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import StatusIcon from "@/components/sepex/StatusIcon";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-
-const STATUS_ICON = {
-  successful: { Icon: CheckCircle2, className: "text-status-successful" },
-  failed: { Icon: XCircle, className: "text-status-failed" },
-  running: { Icon: Loader2, className: "text-status-running animate-spin" },
-  accepted: { Icon: Clock, className: "text-status-accepted" },
-  dismissed: { Icon: Ban, className: "text-status-dismissed" },
-  lost: { Icon: CircleHelp, className: "text-status-lost" }
-};
-
-function StatusIcon({ status }) {
-  const entry = STATUS_ICON[status];
-  if (!entry) return null;
-  const { Icon, className } = entry;
-  return <Icon className={`h-4 w-4 ${className}`} />;
-}
 
 function formatTime(updated) {
   if (!updated) return "—";

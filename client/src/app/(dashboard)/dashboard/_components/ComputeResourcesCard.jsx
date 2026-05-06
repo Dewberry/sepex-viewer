@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Cpu, MemoryStick } from "lucide-react";
-import { getLastUpdatedLabel } from "@/app/(dashboard)/dashboard/_utils/relativeTime";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getLastUpdatedLabel } from "@/lib/time";
 
 // Sepex API returns memory in MB (see api/jobs/resource_pool.go). Display in GB.
 const mbToGb = (mb) => Math.round(((mb ?? 0) / 1024) * 10) / 10;

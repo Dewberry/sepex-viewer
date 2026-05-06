@@ -3,10 +3,10 @@
 import { Copy, Server } from "lucide-react";
 import { toast } from "sonner";
 import DismissJobButton from "@/app/(dashboard)/jobs/[jobID]/_components/DismissJobButton";
-import StatusIcon from "@/app/(dashboard)/jobs/[jobID]/_components/StatusIcon";
 import { getElapsed } from "@/app/(dashboard)/jobs/_utils/elapsed";
-import { getRelativeTime } from "@/app/(dashboard)/jobs/_utils/relativeTime";
+import StatusIcon from "@/components/sepex/StatusIcon";
 import { ACTIVE_STATUSES } from "@/lib/sepex";
+import { getRelativeTime } from "@/lib/time";
 
 export default function RunSummaryCard({ job }) {
   const isActive = ACTIVE_STATUSES.has(job.status);

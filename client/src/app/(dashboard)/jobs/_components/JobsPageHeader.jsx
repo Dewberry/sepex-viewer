@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
-import { getLastUpdatedLabel } from "@/app/(dashboard)/jobs/_utils/relativeTime";
 import { Button } from "@/components/ui/button";
+import { getLastUpdatedLabel } from "@/lib/time";
 
 export default function JobsPageHeader({
   resultCount,

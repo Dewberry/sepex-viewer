@@ -1,8 +1,7 @@
 "use client";
 
 import { ArrowRight, FolderOpen, X } from "lucide-react";
-import StatusIcon from "@/app/(dashboard)/builder/_components/StatusIcon";
-import { getRelativeTime } from "@/app/(dashboard)/builder/_utils/relativeTime";
+import StatusIcon from "@/components/sepex/StatusIcon";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -10,6 +9,7 @@ import {
   PopoverTrigger
 } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getCompactRelativeTime } from "@/lib/time";
 
 export default function RecentPayloadsPopover({
   open,
@@ -83,7 +83,7 @@ export default function RecentPayloadsPopover({
                       </div>
                     </div>
                     <div className="whitespace-nowrap text-xs text-muted-foreground">
-                      {getRelativeTime(job.updated)}
+                      {getCompactRelativeTime(job.updated)}
                     </div>
                   </div>
                 </button>
