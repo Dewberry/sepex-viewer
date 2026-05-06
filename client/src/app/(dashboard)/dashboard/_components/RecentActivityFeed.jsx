@@ -1,29 +1,39 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { getRelativeTime } from "@/app/(dashboard)/dashboard/_utils/relativeTime";
+import {
+  ArrowRight,
+  Ban,
+  CheckCircle2,
+  CircleHelp,
+  Clock,
+  Loader2,
+  XCircle
+} from "lucide-react";
+import StatusPill from "@/app/(dashboard)/jobs/_components/StatusPill";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const STATUS_TONE = {
-  successful: "bg-status-successful text-white",
-  failed: "bg-status-failed text-white",
-  running: "bg-status-running text-white",
-  accepted: "bg-status-accepted text-white",
-  dismissed: "border border-status-dismissed text-status-dismissed",
-  lost: "border border-status-lost text-status-lost"
+const STATUS_ICON = {
+  successful: { Icon: CheckCircle2, className: "text-status-successful" },
+  failed: { Icon: XCircle, className: "text-status-failed" },
+  running: { Icon: Loader2, className: "text-status-running animate-spin" },
+  accepted: { Icon: Clock, className: "text-status-accepted" },
+  dismissed: { Icon: Ban, className: "text-status-dismissed" },
+  lost: { Icon: CircleHelp, className: "text-status-lost" }
 };
 
-function StatusPill({ status }) {
-  return (
-    <span
-      className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-        STATUS_TONE[status] || "bg-muted text-muted-foreground"
-      }`}
-    >
-      {status}
-    </span>
-  );
+function StatusIcon({ status }) {
+  const entry = STATUS_ICON[status];
+  if (!entry) return null;
+  const { Icon, className } = entry;
+  return <Icon className={`h-4 w-4 ${className}`} />;
+}
+
+function formatTime(updated) {
+  if (!updated) return "—";
+  const d = new Date(updated);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleTimeString();
 }
 
 export default function RecentActivityFeed({
@@ -51,20 +61,25 @@ export default function RecentActivityFeed({
           No recent activity.
         </div>
       ) : (
-        <ul className="divide-y divide-border">
+        <ul className="space-y-2">
           {jobs.slice(0, limit).map((job) => (
             <li key={job.jobID}>
               <Link
                 href={`/jobs/${job.jobID}`}
-                className="-mx-2 flex items-center gap-3 rounded px-2 py-2 transition-colors hover:bg-accent/50"
+                className="-mx-2 flex items-center gap-3 rounded border-b border-border px-2 py-2 transition-colors last:border-0 hover:bg-accent/50"
               >
-                <StatusPill status={job.status} />
+                <span className="flex w-8 items-center justify-center">
+                  <StatusIcon status={job.status} />
+                </span>
                 <div className="min-w-0 flex-1">
-                  <div
-                    className="truncate font-mono text-sm font-medium"
-                    title={job.jobID}
-                  >
-                    {(job.jobID || "").slice(-8)}
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="truncate font-mono text-sm font-medium"
+                      title={job.jobID}
+                    >
+                      {job.jobID}
+                    </span>
+                    <StatusPill status={job.status} />
                   </div>
                   <div className="truncate text-xs text-muted-foreground">
                     {job.processID || "—"}
@@ -72,7 +87,7 @@ export default function RecentActivityFeed({
                   </div>
                 </div>
                 <span className="hidden text-xs whitespace-nowrap text-muted-foreground sm:block">
-                  {getRelativeTime(job.updated)}
+                  {formatTime(job.updated)}
                 </span>
               </Link>
             </li>
@@ -80,13 +95,12 @@ export default function RecentActivityFeed({
         </ul>
       )}
 
-      <Link
-        href="/jobs"
-        className="mt-3 inline-flex items-center gap-1 text-xs text-dewberry-teal hover:underline"
-      >
-        View all jobs
-        <ArrowRight className="h-3 w-3" />
-      </Link>
+      <Button asChild variant="ghost" size="sm" className="mt-3 w-full">
+        <Link href="/jobs">
+          View all jobs
+          <ArrowRight className="ml-1 h-3 w-3" />
+        </Link>
+      </Button>
     </div>
   );
 }
