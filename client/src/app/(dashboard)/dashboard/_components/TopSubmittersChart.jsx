@@ -35,7 +35,7 @@ export default function TopSubmittersChart({ data, isLoading, isError }) {
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-muted">
                   <div
-                    className="h-full rounded-full bg-dewberry-teal transition-all"
+                    className="h-full rounded-full bg-status-successful transition-all"
                     style={{ width: `${pct}%` }}
                   />
                 </div>
