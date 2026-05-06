@@ -10,7 +10,6 @@ import {
   Loader2,
   XCircle
 } from "lucide-react";
-import StatusPill from "@/app/(dashboard)/jobs/_components/StatusPill";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -72,14 +71,11 @@ export default function RecentActivityFeed({
                   <StatusIcon status={job.status} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="truncate font-mono text-sm font-medium"
-                      title={job.jobID}
-                    >
-                      {job.jobID}
-                    </span>
-                    <StatusPill status={job.status} />
+                  <div
+                    className="truncate font-mono text-sm font-medium"
+                    title={job.jobID}
+                  >
+                    {job.jobID}
                   </div>
                   <div className="truncate text-xs text-muted-foreground">
                     {job.processID || "—"}
