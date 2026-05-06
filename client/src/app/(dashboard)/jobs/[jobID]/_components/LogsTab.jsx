@@ -11,11 +11,29 @@ import {
 } from "lucide-react";
 import LogLine from "@/app/(dashboard)/jobs/[jobID]/_components/LogLine";
 import useJobLogsQuery from "@/app/(dashboard)/jobs/[jobID]/_hooks/useJobLogsQuery";
-import { groupProcessLogs } from "@/app/(dashboard)/jobs/[jobID]/_utils/groupLogs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const LEVELS = ["INFO", "WARN", "ERROR"];
+
+// Many compute plugins (e.g. LISFLOOD watchdog) leave the structured `level`
+// field empty and embed the level as a `[INFO]`/`[WARN]`/`[ERROR]` prefix in
+// the message. Pull it out so the level filter and color coding work.
+const LEVEL_PREFIX = /^\[(INFO|WARN(?:ING)?|ERROR)\] ?/i;
+
+function normalizeLogEntry(entry) {
+  const rawMsg = entry?.msg || "";
+  const match = rawMsg.match(LEVEL_PREFIX);
+  let level = (entry?.level || "").toUpperCase();
+  let msg = rawMsg;
+  if (match) {
+    msg = rawMsg.slice(match[0].length);
+    if (!level) level = match[1].toUpperCase();
+  }
+  if (level === "WARNING") level = "WARN";
+  if (!level) level = "INFO";
+  return { ...entry, level, msg };
+}
 
 export default function LogsTab({ jobID, jobStatus }) {
   const [stream, setStream] = useState("process");
@@ -29,18 +47,21 @@ export default function LogsTab({ jobID, jobStatus }) {
     jobStatus
   });
 
-  const allLogs = useMemo(
-    () =>
-      stream === "process" ? data?.process_logs || [] : data?.server_logs || [],
-    [data, stream]
-  );
+  const allLogs = useMemo(() => {
+    const raw =
+      stream === "process" ? data?.process_logs || [] : data?.server_logs || [];
+    return raw.map(normalizeLogEntry);
+  }, [data, stream]);
 
-  const groups = useMemo(() => {
-    if (stream === "server") {
-      return [{ title: "Server events", logs: allLogs }];
-    }
-    return groupProcessLogs(allLogs);
-  }, [allLogs, stream]);
+  const groups = useMemo(
+    () => [
+      {
+        title: stream === "server" ? "Server events" : "Process logs",
+        logs: allLogs
+      }
+    ],
+    [allLogs, stream]
+  );
 
   const searchLower = search.toLowerCase();
   const filteredGroups = groups
