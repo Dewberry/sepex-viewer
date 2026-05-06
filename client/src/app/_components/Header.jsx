@@ -3,6 +3,7 @@ import { Activity } from "lucide-react";
 import CommandPaletteButton from "@/app/_components/CommandPaletteButton";
 import MobileNav from "@/app/_components/MobileNav";
 import { navItems } from "@/app/_components/navItems";
+import NavLink from "@/app/_components/NavLink";
 import UserPopover from "@/app/_components/UserPopover";
 import { Separator } from "@/components/ui/separator";
 
@@ -17,13 +18,7 @@ export default function Header() {
         <Separator orientation="vertical" className="hidden h-6 md:block" />
         <nav className="hidden items-center gap-1 md:flex">
           {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-              {item.label}
-            </Link>
+            <NavLink key={item.href} href={item.href} label={item.label} />
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
