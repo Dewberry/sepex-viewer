@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  CheckCircle2,
-  Loader2,
-  ListChecks,
-  TrendingUp,
-  XCircle
-} from "lucide-react";
+import { CheckCircle2, Loader2, TrendingUp, XCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 function Tile({ label, value, icon, accentClass }) {
@@ -36,11 +30,7 @@ export default function KpiTiles({ kpis, isLoading }) {
 
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-      <Tile
-        label="Total Jobs"
-        value={kpis.total}
-        icon={<ListChecks className="h-3.5 w-3.5" />}
-      />
+      <Tile label="Total Jobs" value={kpis.total} />
       <Tile
         label="Successful"
         value={kpis.successful}
