@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Search } from "lucide-react";
+import { LayoutGrid } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -299,15 +299,21 @@ export default function BuilderPage() {
       {!selectedProcessId && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-            <Search className="h-8 w-8 text-muted-foreground" />
+            <LayoutGrid className="h-8 w-8 text-muted-foreground" />
           </div>
           <h3 className="mb-2 text-lg font-semibold">
-            Select a process to get started
+            Select a process to begin
           </h3>
           <p className="max-w-md text-sm text-muted-foreground">
-            Choose a registered process from the picker above to compose and
-            validate a job payload.
+            Choose a registered OGC Process from the dropdown above to build and
+            submit an execution payload.
           </p>
+          {!processesQuery.isLoading && (
+            <p className="mt-3 text-xs text-muted-foreground">
+              {processList.length}{" "}
+              {processList.length === 1 ? "process" : "processes"} available
+            </p>
+          )}
         </div>
       )}
     </div>
