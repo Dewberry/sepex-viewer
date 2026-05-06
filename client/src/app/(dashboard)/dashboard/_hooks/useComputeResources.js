@@ -8,6 +8,7 @@ export default function useComputeResources() {
     queryKey: ["admin", "resources"],
     queryFn: () => getAdminResources(),
     refetchInterval: 5_000,
-    staleTime: 0
+    staleTime: 0,
+    select: (payload) => payload?.resources ?? payload
   });
 }

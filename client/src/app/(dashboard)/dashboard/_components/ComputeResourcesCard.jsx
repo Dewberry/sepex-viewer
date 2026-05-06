@@ -5,6 +5,9 @@ import { Cpu, MemoryStick } from "lucide-react";
 import { getLastUpdatedLabel } from "@/app/(dashboard)/dashboard/_utils/relativeTime";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// Sepex API returns memory in MB (see api/jobs/resource_pool.go). Display in GB.
+const mbToGb = (mb) => Math.round(((mb ?? 0) / 1024) * 10) / 10;
+
 function Bar({ usedPct = 0, queuedPct = 0, accentVar }) {
   const used = Math.min(100, Math.max(0, usedPct));
   const queued = Math.min(100 - used, Math.max(0, queuedPct));
@@ -108,8 +111,8 @@ export default function ComputeResourcesCard({
           <Gauge
             icon={<MemoryStick className="h-4 w-4" />}
             label="Memory"
-            used={data?.usedMemory ?? 0}
-            max={data?.maxMemory ?? 0}
+            used={mbToGb(data?.usedMemory)}
+            max={mbToGb(data?.maxMemory)}
             unit="GB"
             usedPct={data?.usedMemPct}
             queuedPct={data?.queuedMemPct}
