@@ -2,36 +2,25 @@
 
 import Link from "next/link";
 import { AlertTriangle, ArrowRight } from "lucide-react";
-import useFailedJobReasons from "@/app/(dashboard)/dashboard/_hooks/useFailedJobReasons";
-import { getRelativeTime } from "@/app/(dashboard)/dashboard/_utils/relativeTime";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
-function ReasonText({ entry }) {
-  if (entry?.isLoading) {
-    return <Skeleton className="h-3 w-40" />;
-  }
-  if (entry?.isError) {
-    return <span className="text-muted-foreground">Logs unavailable</span>;
-  }
-  if (!entry?.reason) {
-    return (
-      <span className="text-muted-foreground">No ERROR entry in logs</span>
-    );
-  }
-  return <span className="font-mono text-foreground/80">{entry.reason}</span>;
+const MAX_ROWS = 3;
+
+function formatTime(updated) {
+  if (!updated) return "—";
+  const d = new Date(updated);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleTimeString();
 }
 
 export default function FailedJobsAlert({ jobs, isLoading, isError }) {
-  const jobIDs = (jobs || []).map((j) => j.jobID);
-  const reasons = useFailedJobReasons(jobIDs);
-
   if (isLoading) {
     return (
       <div className="rounded-lg border border-status-failed/30 bg-status-failed/5 p-4">
         <Skeleton className="h-5 w-32" />
         <div className="mt-3 space-y-2">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-14 w-full" />
+          <Skeleton className="h-14 w-full" />
         </div>
       </div>
     );
@@ -51,6 +40,8 @@ export default function FailedJobsAlert({ jobs, isLoading, isError }) {
     return null;
   }
 
+  const visible = jobs.slice(0, MAX_ROWS);
+
   return (
     <div className="rounded-lg border border-status-failed/30 bg-status-failed/5 p-4">
       <div className="mb-3 flex items-center gap-2">
@@ -60,66 +51,46 @@ export default function FailedJobsAlert({ jobs, isLoading, isError }) {
         </h3>
       </div>
 
-      <div className="overflow-hidden rounded-md border border-border bg-card">
-        <table className="w-full text-sm">
-          <thead className="border-b border-border bg-muted text-xs tracking-wider text-muted-foreground uppercase">
-            <tr>
-              <th className="p-2 text-left">Job ID</th>
-              <th className="p-2 text-left">Process</th>
-              <th className="p-2 text-left">Submitter</th>
-              <th className="p-2 text-left">Updated</th>
-              <th className="p-2 text-left">Reason</th>
-            </tr>
-          </thead>
-          <tbody>
-            {jobs.map((job) => (
-              <tr
-                key={job.jobID}
-                className="border-b border-border last:border-0 transition-colors hover:bg-muted/50"
+      <div className="space-y-2">
+        {visible.map((job) => (
+          <div
+            key={job.jobID}
+            className="flex items-center justify-between gap-3 rounded border border-border bg-card p-3 transition-shadow hover:shadow-md"
+          >
+            <div className="min-w-0 flex-1">
+              <Link
+                href={`/jobs/${job.jobID}`}
+                className="block truncate font-mono text-sm font-medium hover:underline"
               >
-                <td className="p-2">
-                  <Link
-                    href={`/jobs/${job.jobID}`}
-                    className="font-mono text-xs text-dewberry-teal hover:underline"
-                  >
-                    {job.jobID}
-                  </Link>
-                </td>
-                <td className="p-2 text-xs">{job.processID || "—"}</td>
-                <td className="p-2 text-xs">{job.submitter || "—"}</td>
-                <td
-                  className="p-2 text-xs text-muted-foreground"
-                  title={job.updated ? new Date(job.updated).toUTCString() : ""}
-                >
-                  {getRelativeTime(job.updated)}
-                </td>
-                <td className="max-w-xs p-2 text-xs">
-                  <div
-                    className="truncate"
-                    title={reasons[job.jobID]?.reason || ""}
-                  >
-                    <ReasonText entry={reasons[job.jobID]} />
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                {job.jobID}
+              </Link>
+              <div className="truncate text-xs text-muted-foreground">
+                {job.processID || "—"} · {job.submitter || "—"} ·{" "}
+                {formatTime(job.updated)}
+              </div>
+            </div>
+            <Button asChild variant="ghost" size="sm" className="text-xs">
+              <Link href={`/jobs/${job.jobID}?tab=logs`}>View logs</Link>
+            </Button>
+          </div>
+        ))}
       </div>
 
-      <div className="mt-3 flex items-center justify-between">
-        <p className="text-xs text-muted-foreground">
-          * Reason summarized from{" "}
-          <span className="font-mono">/jobs/&#123;jobID&#125;/logs</span> (last
-          ERROR-level entry)
-        </p>
-        <Link
-          href="/jobs?status=failed"
-          className="inline-flex items-center gap-1 text-xs text-red-700 hover:underline dark:text-red-400"
-        >
+      <Button
+        asChild
+        variant="ghost"
+        size="sm"
+        className="mt-3 w-full text-status-failed hover:text-status-failed"
+      >
+        <Link href="/jobs?status=failed">
           View all failures
-          <ArrowRight className="h-3 w-3" />
+          <ArrowRight className="ml-1 h-3 w-3" />
         </Link>
+      </Button>
+
+      <div className="mt-2 text-xs text-muted-foreground">
+        * Reason from{" "}
+        <span className="font-mono">/jobs/&#123;id&#125;/logs</span>
       </div>
     </div>
   );
