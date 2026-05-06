@@ -16,13 +16,11 @@ import useSelectedJobUrlSync from "@/app/(dashboard)/jobs/_hooks/useSelectedJobU
 import buildJobsQueryParams from "@/app/(dashboard)/jobs/_utils/buildJobsQueryParams";
 import { ACTIVE_STATUSES, listProcesses } from "@/lib/sepex";
 
-const EMPTY_FILTERS = {
-  search: "",
-  processID: "",
-  status: "",
-  submitter: "",
-  tags: ""
-};
+const FILTER_KEYS = ["search", "processID", "status", "submitter", "tags"];
+const EMPTY_FILTERS = Object.fromEntries(FILTER_KEYS.map((k) => [k, ""]));
+
+const filtersFromSearchParams = (sp) =>
+  Object.fromEntries(FILTER_KEYS.map((k) => [k, sp?.get(k) ?? ""]));
 
 function JobsPageInner() {
   const queryClient = useQueryClient();
@@ -32,7 +30,9 @@ function JobsPageInner() {
   const searchInputRef = useRef(null);
   const [selectedJobID, setSelectedJobID] = useSelectedJobUrlSync();
 
-  const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const [filters, setFilters] = useState(() =>
+    filtersFromSearchParams(searchParams)
+  );
   const [pageSize, setPageSize] = useState(20);
   const [offset, setOffset] = useState(0);
 
