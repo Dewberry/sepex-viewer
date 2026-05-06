@@ -10,7 +10,7 @@ import { ACTIVE_STATUSES } from "@/lib/sepex";
 
 function TagChip({ tag }) {
   return (
-    <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+    <span className="inline-flex items-center rounded-md border border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground">
       {tag}
     </span>
   );

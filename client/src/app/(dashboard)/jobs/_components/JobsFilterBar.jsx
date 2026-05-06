@@ -24,8 +24,8 @@ export default function JobsFilterBar({
 
   return (
     <div className="rounded-lg border border-border bg-card p-4">
-      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-5">
-        <div className="relative lg:col-span-2">
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+        <div className="relative">
           <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             ref={searchInputRef}
@@ -78,14 +78,6 @@ export default function JobsFilterBar({
           placeholder="Submitter…"
           value={filters.submitter}
           onChange={(e) => update({ submitter: e.target.value })}
-        />
-
-        <Input
-          type="text"
-          placeholder="Tags (comma-separated)…"
-          value={filters.tags}
-          onChange={(e) => update({ tags: e.target.value })}
-          className="lg:col-span-2"
         />
       </div>
     </div>
