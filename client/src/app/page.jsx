@@ -1,16 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Activity,
-  Monitor,
-  Moon,
-  PlayCircle,
-  Sun,
-  Terminal
-} from "lucide-react";
-import { useTheme } from "next-themes";
+import { Activity, PlayCircle, Terminal } from "lucide-react";
+import ThemeSwitcher from "@/app/_components/ThemeSwitcher";
 import { Button } from "@/components/ui/button";
 
 const SPARK_BARS = [3, 4, 5, 7, 6, 8, 9, 7, 10, 11, 9, 12, 11, 13, 14, 15];
@@ -90,47 +82,6 @@ function LogTailCard() {
       <div>[INFO] 14:23:01 ndvi-tile-007 accepted</div>
       <div>[INFO] 14:23:02 ndvi-tile-007 → running</div>
       <div>[INFO] 14:23:18 ndvi-tile-007 → successful</div>
-    </div>
-  );
-}
-
-function ThemeSwitcher() {
-  const { theme, setTheme } = useTheme();
-  // Defer theme-dependent rendering until after hydration. The server can't
-  // know the user's stored preference, so until we mount we treat every option
-  // as inactive — matches the SSR output and avoids an aria-pressed mismatch.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const options = [
-    { id: "light", label: "Light mode", icon: Sun },
-    { id: "dark", label: "Dark mode", icon: Moon },
-    { id: "system", label: "System preference", icon: Monitor }
-  ];
-  return (
-    <div className="flex items-center gap-2">
-      <span>Theme:</span>
-      <div className="flex gap-1 rounded-lg bg-muted p-1">
-        {options.map(({ id, label, icon: Icon }) => {
-          const active = mounted && theme === id;
-          return (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setTheme(id)}
-              title={label}
-              aria-label={label}
-              aria-pressed={active}
-              className={`rounded px-2 py-1 transition-colors ${
-                active
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Icon className="h-3.5 w-3.5" />
-            </button>
-          );
-        })}
-      </div>
     </div>
   );
 }
