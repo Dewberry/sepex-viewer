@@ -16,23 +16,23 @@ export const STATUS_META = {
   successful: {
     Icon: CheckCircle2,
     iconClass: "text-status-successful",
-    pillClass: "bg-status-successful text-black"
+    pillClass: "bg-status-successful text-white"
   },
   failed: {
     Icon: XCircle,
     iconClass: "text-status-failed",
-    pillClass: "bg-status-failed text-black"
+    pillClass: "bg-status-failed text-white"
   },
   running: {
     Icon: Loader2,
     iconClass: "text-status-running",
-    pillClass: "bg-status-running text-black",
+    pillClass: "bg-status-running text-white",
     spin: true
   },
   accepted: {
     Icon: Clock,
     iconClass: "text-status-accepted",
-    pillClass: "bg-status-accepted text-black"
+    pillClass: "bg-status-accepted text-white"
   },
   dismissed: {
     Icon: Ban,

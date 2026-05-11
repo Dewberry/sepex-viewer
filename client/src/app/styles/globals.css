@@ -11,10 +11,13 @@
   --dewberry-teal: #336b87;
   --dewberry-charcoal: #2c2924;
 
-  --status-successful: #22c55e;
-  --status-running: #eab308;
-  --status-accepted: #0ea5e9;
-  --status-failed: #ef4444;
+  /* Darkened from 500-level (Figma Make) to 700-level so white pill text
+     clears WCAG AA (4.5:1) on every solid-background status chip.
+     Successful 5.8:1 · Running 5.1:1 · Accepted 5.8:1 · Failed 6.6:1. */
+  --status-successful: #15803d;
+  --status-running: #b45309;
+  --status-accepted: #0369a1;
+  --status-failed: #b91c1c;
   --status-dismissed: #64748b;
   --status-lost: #a855f7;
 
