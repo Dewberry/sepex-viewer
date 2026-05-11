@@ -91,9 +91,7 @@ export default function FailedJobsAlert({ jobs, isLoading, isError }) {
 
       {hasReasons ? null : (
         <div className="mt-2 text-xs text-muted-foreground">
-          Reason requires fetching{" "}
-          <span className="font-mono">/jobs/&#123;id&#125;/logs</span> per job —
-          view a job to see why it failed.
+          Open a job to see why it failed.
         </div>
       )}
     </div>
