@@ -55,7 +55,7 @@ export default function AppliedFiltersBar({ filters, onChange, onClearAll }) {
         variant="ghost"
         size="sm"
         onClick={onClearAll}
-        className="h-7 text-xs"
+        className="ml-auto h-7 text-xs"
       >
         Clear all
       </Button>
