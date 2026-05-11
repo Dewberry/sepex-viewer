@@ -21,6 +21,16 @@
   --status-dismissed: #64748b;
   --status-lost: #a855f7;
 
+  /* Foreground variants for status colors used as TEXT (not pill bg).
+     Same as base in light mode; lightened in dark mode so they clear AA on
+     dark cards. Pill backgrounds keep using the base tokens so white-on-pill
+     contrast (5.8+:1) is preserved. */
+  --status-successful-fg: var(--status-successful);
+  --status-running-fg: var(--status-running);
+  --status-accepted-fg: var(--status-accepted);
+  --status-failed-fg: var(--status-failed);
+  --destructive-fg: var(--destructive);
+
   --background: #fafaf9;
   --foreground: #1c1917;
   --card: #ffffff;
@@ -70,6 +80,13 @@
      dark surfaces. The bright #336b87 only hits ~3.4:1 on bg / ~2.5:1 on
      card; #5fa3c0 lands at ~7.6:1 / ~5.2:1. */
   --dewberry-teal: #5fa3c0;
+
+  /* Lighter status hues for text use on dark surfaces (≥4.5:1 on charcoal). */
+  --status-successful-fg: #4ade80;
+  --status-running-fg: #fbbf24;
+  --status-accepted-fg: #60a5fa;
+  --status-failed-fg: #f87171;
+  --destructive-fg: #f87171;
 
   --background: #0a0a0a;
   --foreground: #fafaf9;
@@ -150,6 +167,14 @@
   --color-status-failed: var(--status-failed);
   --color-status-dismissed: var(--status-dismissed);
   --color-status-lost: var(--status-lost);
+
+  /* Foreground variants — use these when the color is rendered as TEXT.
+     They auto-lighten in dark mode to keep AA contrast on charcoal. */
+  --color-status-successful-fg: var(--status-successful-fg);
+  --color-status-running-fg: var(--status-running-fg);
+  --color-status-accepted-fg: var(--status-accepted-fg);
+  --color-status-failed-fg: var(--status-failed-fg);
+  --color-destructive-fg: var(--destructive-fg);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

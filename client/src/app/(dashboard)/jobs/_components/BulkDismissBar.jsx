@@ -28,7 +28,7 @@ export default function BulkDismissBar({
         size="sm"
         disabled={isPending}
         onClick={onDismiss}
-        className="gap-2 text-destructive hover:text-destructive"
+        className="gap-2 text-destructive-fg hover:text-destructive-fg"
       >
         <Trash2 className="h-4 w-4" />
         Dismiss {selectedCount}

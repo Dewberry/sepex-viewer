@@ -38,7 +38,7 @@ export default function JobsTable({
   if (isError) {
     return (
       <div className="border-b border-destructive/30 bg-destructive/5 p-3 text-sm">
-        <p className="font-medium text-destructive">
+        <p className="font-medium text-destructive-fg">
           Couldn&rsquo;t reach the API
           {error?.message ? (
             <>

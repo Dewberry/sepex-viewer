@@ -41,7 +41,7 @@ export default function JobsFilterBar({
           value={filters.processID || ANY_VALUE}
           onValueChange={(v) => update({ processID: v === ANY_VALUE ? "" : v })}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full" aria-label="Filter by process">
             <SelectValue
               placeholder={processesLoading ? "Loading…" : "Any process"}
             />
@@ -60,7 +60,7 @@ export default function JobsFilterBar({
           value={filters.status || ANY_VALUE}
           onValueChange={(v) => update({ status: v === ANY_VALUE ? "" : v })}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full" aria-label="Filter by status">
             <SelectValue placeholder="Any status" />
           </SelectTrigger>
           <SelectContent>

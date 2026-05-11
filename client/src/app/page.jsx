@@ -62,7 +62,7 @@ function SparklineCard() {
         <div className="text-xs text-muted-foreground">
           Jobs completed · 24h
         </div>
-        <div className="text-xs text-status-successful">+12%</div>
+        <div className="text-xs text-status-successful-fg">+12%</div>
       </div>
       <div
         role="img"

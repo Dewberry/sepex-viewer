@@ -24,7 +24,7 @@ export default function DismissJobButton({ jobID }) {
         size="sm"
         onClick={() => setOpen(true)}
         disabled={dismiss.isPending}
-        className="gap-2 text-destructive hover:text-destructive"
+        className="gap-2 text-destructive-fg hover:text-destructive-fg"
       >
         <Trash2 className="h-4 w-4" />
         <span className="hidden sm:inline">Dismiss</span>

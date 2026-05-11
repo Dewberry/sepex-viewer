@@ -248,7 +248,7 @@ export default function LogsTab({ jobID, jobStatus }) {
           {isLoading ? (
             <div className="p-4 text-muted-foreground">Loading logs…</div>
           ) : isError ? (
-            <div className="p-4 text-destructive">
+            <div className="p-4 text-destructive-fg">
               Couldn&rsquo;t load logs:{" "}
               <span className="font-mono">{error?.message}</span>
             </div>

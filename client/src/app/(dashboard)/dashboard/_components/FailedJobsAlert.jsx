@@ -45,7 +45,7 @@ export default function FailedJobsAlert({ jobs, isLoading, isError }) {
           className="h-5 w-5 text-status-failed"
           aria-hidden="true"
         />
-        <h2 className="font-semibold text-status-failed">
+        <h2 className="font-semibold text-status-failed-fg">
           {jobs.length} Failed {jobs.length === 1 ? "Job" : "Jobs"}
         </h2>
       </div>
@@ -68,7 +68,7 @@ export default function FailedJobsAlert({ jobs, isLoading, isError }) {
                 {getCompactRelativeTime(job.updated) || "—"}
               </div>
               {job.lastErrorMessage ? (
-                <div className="mt-1 truncate text-xs text-status-failed/90">
+                <div className="mt-1 truncate text-xs text-status-failed-fg/90">
                   {job.lastErrorMessage}
                 </div>
               ) : null}
@@ -84,7 +84,7 @@ export default function FailedJobsAlert({ jobs, isLoading, isError }) {
         asChild
         variant="ghost"
         size="sm"
-        className="mt-3 w-full text-status-failed hover:text-status-failed"
+        className="mt-3 w-full text-status-failed-fg hover:text-status-failed-fg"
       >
         <Link href="/jobs?status=failed">
           View all failures

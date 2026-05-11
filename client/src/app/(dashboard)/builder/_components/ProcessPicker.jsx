@@ -44,6 +44,7 @@ export default function ProcessPicker({
           type="button"
           variant="outline"
           role="combobox"
+          aria-label="Process"
           aria-expanded={open}
           aria-haspopup="listbox"
           className="h-auto w-full justify-between py-3"

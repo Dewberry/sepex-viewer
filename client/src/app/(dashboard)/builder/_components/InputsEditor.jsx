@@ -71,8 +71,8 @@ export default function InputsEditor({
       <div
         className={`flex items-center gap-2 border-t px-4 py-2.5 text-sm ${
           isFormValid
-            ? "border-status-successful/20 bg-status-successful/10 text-status-successful"
-            : "border-status-running/20 bg-status-running/10 text-status-running"
+            ? "border-status-successful/20 bg-status-successful/10 text-status-successful-fg"
+            : "border-status-running/20 bg-status-running/10 text-status-running-fg"
         }`}
       >
         {isFormValid ? (

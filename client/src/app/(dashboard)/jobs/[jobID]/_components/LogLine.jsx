@@ -1,6 +1,6 @@
 const LEVEL_COLOR = {
-  ERROR: "text-status-failed",
-  WARN: "text-status-running",
+  ERROR: "text-status-failed-fg",
+  WARN: "text-status-running-fg",
   INFO: ""
 };
 

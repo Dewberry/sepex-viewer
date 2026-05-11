@@ -26,7 +26,7 @@ export default function DynamicInputField({
       <label htmlFor={fieldId} className="mb-1.5 block text-sm font-medium">
         {input.title || input.id}
         {required && (
-          <span className="ml-1 text-status-failed" aria-hidden="true">
+          <span className="ml-1 text-status-failed-fg" aria-hidden="true">
             *
           </span>
         )}

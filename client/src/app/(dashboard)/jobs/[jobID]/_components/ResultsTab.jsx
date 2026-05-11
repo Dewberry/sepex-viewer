@@ -66,7 +66,7 @@ export default function ResultsTab({ jobID, jobStatus }) {
 
   if (isError) {
     return (
-      <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+      <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive-fg">
         Couldn&rsquo;t load results:{" "}
         <span className="font-mono">{error?.message}</span>
       </div>

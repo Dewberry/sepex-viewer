@@ -32,7 +32,7 @@ export default function JobDetailContent({ jobID }) {
 
   if (jobQuery.isError) {
     return (
-      <div className="rounded-md border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
+      <div className="rounded-md border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive-fg">
         Couldn&rsquo;t load job:{" "}
         <span className="font-mono">{jobQuery.error?.message}</span>
       </div>

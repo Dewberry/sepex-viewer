@@ -30,7 +30,7 @@ export default function PaginationFooter({
           value={String(pageSize)}
           onValueChange={(v) => onPageSize(Number(v))}
         >
-          <SelectTrigger size="sm" className="w-20">
+          <SelectTrigger size="sm" className="w-20" aria-label="Items per page">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

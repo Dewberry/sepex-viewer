@@ -71,7 +71,10 @@ export default function SaveTemplateDialog({ open, onOpenChange, onSave }) {
             aria-describedby={error ? "template-name-error" : undefined}
           />
           {error && (
-            <p id="template-name-error" className="text-xs text-status-failed">
+            <p
+              id="template-name-error"
+              className="text-xs text-status-failed-fg"
+            >
               {error}
             </p>
           )}
