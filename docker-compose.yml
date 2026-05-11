@@ -43,17 +43,11 @@ services:
     env_file:
       - .env
     environment:
-      # Browser hits the host-exposed port. All current data fetching is
-      # client-side via TanStack Query; if RSC fetches are added, plumb a
-      # separate server-only env var pointing at http://sepex:5050.
-      NEXT_PUBLIC_SEPEX_BASE_URL: https://papi.dewberryanalytics.com
-      NEXT_PUBLIC_SEPEX_USER_EMAIL: dev@dewberry.local
+      # Docker-only runtime tweaks. All NEXT_PUBLIC_* / KEYCLOAK_* / AUTH_*
+      # config lives in the root .env file (loaded via env_file above).
       NEXT_TELEMETRY_DISABLED: '1'
       WATCHPACK_POLLING: 'true'
       CHOKIDAR_USEPOLLING: 'true'
-      # Skip the startup-dev.sh wait-for-local-sepex loop now that the API is remote.
-      SEPEX_HOST: papi.dewberryanalytics.com
-      SEPEX_PORT: '443'
     ports:
       - '3000:3000'
     volumes:

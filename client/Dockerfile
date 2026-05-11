@@ -10,13 +10,10 @@ RUN npm ci
 FROM node:22-alpine AS dev
 WORKDIR /app
 
-RUN apk add --no-cache netcat-openbsd ca-certificates
+RUN apk add --no-cache ca-certificates
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-COPY startup-dev.sh /app/startup-dev.sh
-RUN chmod +x /app/startup-dev.sh
 
 ENV NODE_ENV=development \
     HOSTNAME=0.0.0.0 \
@@ -24,4 +21,4 @@ ENV NODE_ENV=development \
 
 EXPOSE 3000
 
-CMD ["sh", "/app/startup-dev.sh"]
+CMD ["npm", "run", "dev", "--", "--hostname", "0.0.0.0"]
