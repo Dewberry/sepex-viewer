@@ -52,14 +52,17 @@ export default function CommandPalette() {
     if (!open) setQuery("");
   }, [open]);
 
-  const trimmed = query.trim();
+  // Fetch a wider recent slice once; cmdk's CommandInput filters client-side
+  // against the `value` prop on each item. The Sepex API has no `?q=` yet, so
+  // doing the search server-side wouldn't actually narrow anything.
   const jobsQuery = useQuery({
-    queryKey: ["command-palette", "jobs", trimmed],
-    queryFn: () => listJobs(trimmed ? { q: trimmed, limit: 8 } : { limit: 5 }),
+    queryKey: ["command-palette", "jobs"],
+    queryFn: () => listJobs({ limit: 50 }),
     enabled: open,
     staleTime: 5_000
   });
   const jobs = jobsQuery.data?.jobs || [];
+  const trimmed = query.trim();
 
   const go = (path) => {
     setOpen(false);

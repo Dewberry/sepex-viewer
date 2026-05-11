@@ -21,23 +21,9 @@ function Chip({ label, onRemove }) {
 
 export default function AppliedFiltersBar({ filters, onChange, onClearAll }) {
   const hasAny =
-    filters.search ||
-    filters.processID ||
-    filters.status ||
-    filters.submitter ||
-    filters.tags;
+    filters.search || filters.processID || filters.status || filters.submitter;
 
   if (!hasAny) return null;
-
-  const tagList = filters.tags
-    .split(",")
-    .map((t) => t.trim())
-    .filter(Boolean);
-
-  const removeTag = (tag) => {
-    const next = tagList.filter((t) => t !== tag).join(", ");
-    onChange({ ...filters, tags: next });
-  };
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -65,9 +51,6 @@ export default function AppliedFiltersBar({ filters, onChange, onClearAll }) {
           onRemove={() => onChange({ ...filters, submitter: "" })}
         />
       ) : null}
-      {tagList.map((tag) => (
-        <Chip key={tag} label={`Tag: ${tag}`} onRemove={() => removeTag(tag)} />
-      ))}
       <Button
         variant="ghost"
         size="sm"

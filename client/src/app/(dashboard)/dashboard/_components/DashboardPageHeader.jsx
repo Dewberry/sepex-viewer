@@ -18,15 +18,11 @@ export default function DashboardPageHeader({
         <p className="mt-1 text-sm text-muted-foreground">
           {PROPOSED_API_ENABLED
             ? "System health and recent activity at a glance."
-            : "KPIs and charts reflect the most recent 100 jobs (current API pagination cap)."}
+            : "Most recent 100 jobs (current API pagination cap), windowed to the selected range."}
         </p>
       </div>
       <div className="flex items-center gap-3">
-        {PROPOSED_API_ENABLED ? (
-          <div className="flex flex-col items-end gap-1">
-            <TimeRangePicker value={range} onChange={onRangeChange} />
-          </div>
-        ) : null}
+        <TimeRangePicker value={range} onChange={onRangeChange} />
         <Button
           variant="ghost"
           size="icon"

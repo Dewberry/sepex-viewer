@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TopSubmittersChart({ data, isLoading, isError }) {
@@ -23,7 +24,12 @@ export default function TopSubmittersChart({ data, isLoading, isError }) {
           {data.map((entry) => {
             const pct = total > 0 ? (entry.count / total) * 100 : 0;
             return (
-              <div key={entry.submitter}>
+              <Link
+                key={entry.submitter}
+                href={`/jobs?submitter=${encodeURIComponent(entry.submitter)}`}
+                className="-mx-2 block rounded px-2 py-1 transition-colors hover:bg-accent/50"
+                title={`Filter Jobs by ${entry.submitter}`}
+              >
                 <div className="mb-1 flex justify-between text-xs">
                   <span
                     className="truncate font-mono text-muted-foreground"
@@ -39,7 +45,7 @@ export default function TopSubmittersChart({ data, isLoading, isError }) {
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

@@ -5,12 +5,7 @@ import { ArrowRight } from "lucide-react";
 import StatusIcon from "@/components/sepex/StatusIcon";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-
-function formatTime(updated) {
-  if (!updated) return "—";
-  const d = new Date(updated);
-  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleTimeString();
-}
+import { getCompactRelativeTime } from "@/lib/time";
 
 export default function RecentActivityFeed({
   jobs,
@@ -59,8 +54,11 @@ export default function RecentActivityFeed({
                     {job.submitter ? <> · {job.submitter}</> : null}
                   </div>
                 </div>
-                <span className="hidden text-xs whitespace-nowrap text-muted-foreground sm:block">
-                  {formatTime(job.updated)}
+                <span
+                  className="hidden text-xs whitespace-nowrap text-muted-foreground sm:block"
+                  title={job.updated ? new Date(job.updated).toUTCString() : ""}
+                >
+                  {getCompactRelativeTime(job.updated) || "—"}
                 </span>
               </Link>
             </li>

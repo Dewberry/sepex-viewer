@@ -1,38 +1,38 @@
 services:
-  sepex:
-    container_name: sepex
-    image: ghcr.io/dewberry/sepex/api:dev-2025.11.0-beta
-    ports:
-      - '5050:5050'
-    env_file:
-      - .env
-    volumes:
-      - ./.data/api:/.data
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - process_api_net
-    depends_on:
-      minio:
-        condition: service_started
-      postgres:
-        condition: service_healthy
+  # sepex:
+  #   container_name: sepex
+  #   image: ghcr.io/dewberry/sepex/api:dev-2025.11.0-beta
+  #   ports:
+  #     - '5050:5050'
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - ./.data/api:/.data
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   networks:
+  #     - process_api_net
+  #   depends_on:
+  #     minio:
+  #       condition: service_started
+  #     postgres:
+  #       condition: service_healthy
 
-  viewer:
-    container_name: sepex-viewer
-    build:
-      context: ./app
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-    ports:
-      - '8501:8501'
-    volumes:
-      - .:/app                # for local builds and code changes
-    networks:
-      - process_api_net
-    depends_on:
-      sepex:
-        condition: service_started
+  # viewer:
+  #   container_name: sepex-viewer
+  #   build:
+  #     context: ./app
+  #     dockerfile: Dockerfile
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - '8501:8501'
+  #   volumes:
+  #     - .:/app                # for local builds and code changes
+  #   networks:
+  #     - process_api_net
+  #   depends_on:
+  #     sepex:
+  #       condition: service_started
 
   client:
     container_name: sepex-viewer-client
@@ -40,63 +40,63 @@ services:
       context: ./client
       dockerfile: Dockerfile
       target: dev
+    env_file:
+      - .env
     environment:
       # Browser hits the host-exposed port. All current data fetching is
       # client-side via TanStack Query; if RSC fetches are added, plumb a
       # separate server-only env var pointing at http://sepex:5050.
-      NEXT_PUBLIC_SEPEX_BASE_URL: http://localhost:5050
+      NEXT_PUBLIC_SEPEX_BASE_URL: https://papi.dewberryanalytics.com
       NEXT_PUBLIC_SEPEX_USER_EMAIL: dev@dewberry.local
-      # Enables UI surfaces that depend on Sepex API additions from
-      # research/proposed-next-steps.md (Dashboard time-range picker, inline
-      # failed-job reasons, ⌘K command palette, total/pages pagination).
-      # Leave "false" until those API changes ship.
-      NEXT_PUBLIC_ENABLE_PROPOSED_API: 'false'
       NEXT_TELEMETRY_DISABLED: '1'
       WATCHPACK_POLLING: 'true'
       CHOKIDAR_USEPOLLING: 'true'
+      # Skip the startup-dev.sh wait-for-local-sepex loop now that the API is remote.
+      SEPEX_HOST: papi.dewberryanalytics.com
+      SEPEX_PORT: '443'
     ports:
       - '3000:3000'
     volumes:
       - ./client:/app
-      - /app/node_modules         # keep image's node_modules
-      - /app/.next                 # keep image's .next cache
+      - /app/node_modules # keep image's node_modules
+      - /app/.next # keep image's .next cache
     networks:
       - process_api_net
-    depends_on:
-      sepex:
-        condition: service_started
+    # depends_on:
+    #   sepex:
+    #     condition: service_started
 
-  minio:
-    container_name: minio
-    image: quay.io/minio/minio
-    entrypoint: ["/bin/sh", "/minio-entrypoint.sh"]
-    env_file:
-      - .env
-    ports:
-      - '9000:9000'
-      - '9001:9001'
-    volumes:
-      - ./minio-entrypoint.sh:/minio-entrypoint.sh:ro
-      - ./.data/minio:/data
-    networks:
-      - process_api_net
+  # minio:
+  #   container_name: minio
+  #   image: quay.io/minio/minio
+  #   entrypoint: ["/bin/sh", "/minio-entrypoint.sh"]
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - '9000:9000'
+  #     - '9001:9001'
+  #   volumes:
+  #     - ./minio-entrypoint.sh:/minio-entrypoint.sh:ro
+  #     - ./.data/minio:/data
+  #   networks:
+  #     - process_api_net
 
-  postgres:
-    container_name: postgres
-    image: postgres:17.2-alpine3.20
-    env_file:
-      - .env
-    ports:
-      - '5432:5432'
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    volumes:
-      - ./.data/postgres:/var/lib/postgresql/data
-    networks:
-      - process_api_net
+  # postgres:
+  #   container_name: postgres
+  #   image: postgres:17.2-alpine3.20
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - '5432:5432'
+  #   healthcheck:
+  #     test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   volumes:
+  #     - ./.data/postgres:/var/lib/postgresql/data
+  #   networks:
+  #     - process_api_net
 
 networks:
   process_api_net:

@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import ComputeResourcesCard from "@/app/(dashboard)/dashboard/_components/ComputeResourcesCard";
 import DashboardPageHeader from "@/app/(dashboard)/dashboard/_components/DashboardPageHeader";
 import FailedJobsAlert from "@/app/(dashboard)/dashboard/_components/FailedJobsAlert";
 import JobsByProcessChart from "@/app/(dashboard)/dashboard/_components/JobsByProcessChart";
@@ -10,7 +9,6 @@ import JobsOverTimeChart from "@/app/(dashboard)/dashboard/_components/JobsOverT
 import KpiTiles from "@/app/(dashboard)/dashboard/_components/KpiTiles";
 import RecentActivityFeed from "@/app/(dashboard)/dashboard/_components/RecentActivityFeed";
 import TopSubmittersChart from "@/app/(dashboard)/dashboard/_components/TopSubmittersChart";
-import useComputeResources from "@/app/(dashboard)/dashboard/_hooks/useComputeResources";
 import useDashboardJobs from "@/app/(dashboard)/dashboard/_hooks/useDashboardJobs";
 import useFailedJobs from "@/app/(dashboard)/dashboard/_hooks/useFailedJobs";
 import aggregateByProcess from "@/app/(dashboard)/dashboard/_utils/aggregateByProcess";
@@ -20,11 +18,10 @@ import computeKpis from "@/app/(dashboard)/dashboard/_utils/computeKpis";
 import { getRangeStart } from "@/app/(dashboard)/dashboard/_utils/timeRange";
 
 export default function DashboardPage() {
-  const [range, setRange] = useState("24h");
+  const [range, setRange] = useState("7d");
   const queryClient = useQueryClient();
 
   const jobsQuery = useDashboardJobs(range);
-  const resourcesQuery = useComputeResources();
   const failedQuery = useFailedJobs(5);
 
   const allJobs = useMemo(() => jobsQuery.data?.jobs || [], [jobsQuery.data]);
@@ -56,12 +53,10 @@ export default function DashboardPage() {
 
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-    queryClient.invalidateQueries({ queryKey: ["admin", "resources"] });
     queryClient.invalidateQueries({ queryKey: ["job-logs"] });
   };
 
-  const headerFetching =
-    jobsQuery.isFetching || resourcesQuery.isFetching || failedQuery.isFetching;
+  const headerFetching = jobsQuery.isFetching || failedQuery.isFetching;
 
   return (
     <div className="mx-auto max-w-[1600px] space-y-6 px-4 py-6 lg:px-6">
@@ -87,19 +82,11 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <ComputeResourcesCard
-          data={resourcesQuery.data}
-          isLoading={resourcesQuery.isLoading}
-          isError={resourcesQuery.isError}
-          dataUpdatedAt={resourcesQuery.dataUpdatedAt}
-        />
-        <TopSubmittersChart
-          data={bySubmitter}
-          isLoading={jobsQuery.isLoading}
-          isError={jobsQuery.isError}
-        />
-      </div>
+      <TopSubmittersChart
+        data={bySubmitter}
+        isLoading={jobsQuery.isLoading}
+        isError={jobsQuery.isError}
+      />
 
       <FailedJobsAlert
         jobs={failedQuery.data?.jobs}

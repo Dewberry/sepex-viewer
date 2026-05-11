@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 const SPARK_BARS = [3, 4, 5, 7, 6, 8, 9, 7, 10, 11, 9, 12, 11, 13, 14, 15];
 const SPARK_MAX = 15;
 
-const apiDocsUrl =
-  process.env.NEXT_PUBLIC_API_DOCS_URL ||
-  `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050"}/api`;
+// "View API docs" only renders when an explicit URL is configured — the
+// current Sepex servers (papi included) don't serve docs at a discoverable
+// path, so we don't synthesize one from the base URL.
+const apiDocsUrl = process.env.NEXT_PUBLIC_API_DOCS_URL || "";
 
 function TopographicBackdrop() {
   return (
@@ -119,10 +120,10 @@ export default function LandingPage() {
                   </h1>
                   <p className="text-xl leading-relaxed text-muted-foreground">
                     A modern web UI for any OGC API – Processes server. Submit
-                    jobs, watch them run with live logs and resource gauges, and
-                    inspect results — works for hydrology models, geospatial
-                    analysis, ML pipelines, image processing, or any other
-                    long-running compute workload your team registers.
+                    jobs, watch them run with live logs, and inspect results —
+                    works for hydrology models, geospatial analysis, ML
+                    pipelines, image processing, or any other long-running
+                    compute workload your team registers.
                   </p>
                 </div>
 
@@ -136,15 +137,17 @@ export default function LandingPage() {
                       provider.
                     </span>
                   </div>
-                  <Button size="lg" variant="outline" asChild>
-                    <a
-                      href={apiDocsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View API docs
-                    </a>
-                  </Button>
+                  {apiDocsUrl ? (
+                    <Button size="lg" variant="outline" asChild>
+                      <a
+                        href={apiDocsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View API docs
+                      </a>
+                    </Button>
+                  ) : null}
                 </div>
               </div>
 
@@ -203,8 +206,8 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-2 text-lg font-semibold">Watch them run</h3>
               <p className="text-sm text-muted-foreground">
-                Live status, streaming logs, queue depth, CPU/memory gauges
-                across whatever execution backend you&rsquo;ve configured.
+                Live status and streaming process logs from whatever execution
+                backend you&rsquo;ve configured.
               </p>
             </div>
 
@@ -214,8 +217,8 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-2 text-lg font-semibold">Audit results</h3>
               <p className="text-sm text-muted-foreground">
-                Logs, metadata, depth grids, results JSON, all addressable by
-                URL.
+                Logs, metadata, and download links to result files — every job
+                addressable by URL.
               </p>
             </div>
           </div>

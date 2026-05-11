@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import InputsTab from "@/app/(dashboard)/jobs/[jobID]/_components/InputsTab";
 import LogsTab from "@/app/(dashboard)/jobs/[jobID]/_components/LogsTab";
 import MessageBanner from "@/app/(dashboard)/jobs/[jobID]/_components/MessageBanner";
 import MetadataTab from "@/app/(dashboard)/jobs/[jobID]/_components/MetadataTab";
@@ -58,7 +57,6 @@ export default function JobDetailContent({ jobID }) {
           <TabsTrigger value="logs">Logs</TabsTrigger>
           <TabsTrigger value="results">Results</TabsTrigger>
           <TabsTrigger value="metadata">Metadata</TabsTrigger>
-          <TabsTrigger value="inputs">Inputs</TabsTrigger>
         </TabsList>
         <TabsContent value="logs">
           <LogsTab jobID={jobID} jobStatus={job.status} />
@@ -68,9 +66,6 @@ export default function JobDetailContent({ jobID }) {
         </TabsContent>
         <TabsContent value="metadata">
           <MetadataTab jobID={jobID} />
-        </TabsContent>
-        <TabsContent value="inputs">
-          <InputsTab jobID={jobID} />
         </TabsContent>
       </Tabs>
     </div>

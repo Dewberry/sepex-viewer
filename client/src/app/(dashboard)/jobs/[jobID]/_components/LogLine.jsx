@@ -4,11 +4,15 @@ const LEVEL_COLOR = {
   INFO: ""
 };
 
+// Go's zero-value time. Real Sepex emits this for log entries without a
+// timestamp; formatting it as a clock value (e.g. "8:00:00 PM") is misleading.
+const GO_ZERO_TIME = "0001-01-01T00:00:00Z";
+
 export default function LogLine({ entry }) {
   const level = (entry?.level || "INFO").toUpperCase();
   const color = LEVEL_COLOR[level] ?? "";
   let timeLabel = "";
-  if (entry?.time) {
+  if (entry?.time && entry.time !== GO_ZERO_TIME) {
     try {
       timeLabel = new Date(entry.time).toLocaleTimeString();
     } catch {

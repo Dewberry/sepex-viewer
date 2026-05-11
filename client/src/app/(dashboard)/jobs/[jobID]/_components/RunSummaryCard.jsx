@@ -3,7 +3,6 @@
 import { Copy, Server } from "lucide-react";
 import { toast } from "sonner";
 import DismissJobButton from "@/app/(dashboard)/jobs/[jobID]/_components/DismissJobButton";
-import { getElapsed } from "@/app/(dashboard)/jobs/_utils/elapsed";
 import StatusIcon from "@/components/sepex/StatusIcon";
 import { ACTIVE_STATUSES } from "@/lib/sepex";
 import { getRelativeTime } from "@/lib/time";
@@ -70,19 +69,11 @@ export default function RunSummaryCard({ job }) {
           </div>
         </div>
 
-        <div className="flex gap-6 text-sm">
-          <div>
-            <div className="text-xs tracking-wider text-muted-foreground uppercase">
-              Elapsed
-            </div>
-            <div className="font-mono">{getElapsed(job)}</div>
+        <div className="text-sm">
+          <div className="text-xs tracking-wider text-muted-foreground uppercase">
+            Updated
           </div>
-          <div>
-            <div className="text-xs tracking-wider text-muted-foreground uppercase">
-              Updated
-            </div>
-            <div className="font-mono">{getRelativeTime(job.updated)}</div>
-          </div>
+          <div className="font-mono">{getRelativeTime(job.updated)}</div>
         </div>
 
         {isActive ? (

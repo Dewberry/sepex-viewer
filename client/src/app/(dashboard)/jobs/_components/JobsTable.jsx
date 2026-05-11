@@ -1,20 +1,11 @@
 "use client";
 
 import JobIdLink from "@/app/(dashboard)/jobs/_components/JobIdLink";
-import getRunName from "@/app/(dashboard)/jobs/_utils/getRunName";
 import StatusPill from "@/components/sepex/StatusPill";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ACTIVE_STATUSES } from "@/lib/sepex";
 import { getRelativeTime } from "@/lib/time";
-
-function TagChip({ tag }) {
-  return (
-    <span className="inline-flex items-center rounded-md border border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-      {tag}
-    </span>
-  );
-}
 
 export default function JobsTable({
   jobs,
@@ -61,7 +52,9 @@ export default function JobsTable({
         <p className="mt-1 text-xs text-muted-foreground">
           Make sure the Sepex server is running at{" "}
           <span className="font-mono">
-            {process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050"}
+            {process.env.NEXT_PUBLIC_API_URL ||
+              process.env.NEXT_PUBLIC_SEPEX_BASE_URL ||
+              "http://localhost:5050"}
           </span>
           .
         </p>
@@ -95,10 +88,8 @@ export default function JobsTable({
               <th className="p-2 text-left">Status</th>
               <th className="p-2 text-left">Job ID</th>
               <th className="p-2 text-left">Process</th>
-              <th className="p-2 text-left">Run (from tags)</th>
               <th className="p-2 text-left">Submitter</th>
               <th className="p-2 text-left">Updated</th>
-              <th className="p-2 text-left">Tags</th>
             </tr>
           </thead>
           <tbody>
@@ -134,9 +125,6 @@ export default function JobsTable({
                     <JobIdLink jobID={job.jobID} onClick={onOpenJob} />
                   </td>
                   <td className="p-2 text-sm">{job.processID}</td>
-                  <td className="p-2 font-mono text-xs">
-                    {getRunName(job.tags)}
-                  </td>
                   <td className="p-2 text-sm">{job.submitter || "—"}</td>
                   <td
                     className="p-2 text-sm text-muted-foreground"
@@ -145,16 +133,6 @@ export default function JobsTable({
                     }
                   >
                     {getRelativeTime(job.updated)}
-                  </td>
-                  <td className="p-2">
-                    <div className="flex flex-wrap gap-1">
-                      {(job.tags || []).slice(0, 2).map((tag) => (
-                        <TagChip key={tag} tag={tag} />
-                      ))}
-                      {(job.tags || []).length > 2 ? (
-                        <TagChip tag={`+${(job.tags || []).length - 2}`} />
-                      ) : null}
-                    </div>
                   </td>
                 </tr>
               );
@@ -190,14 +168,9 @@ export default function JobsTable({
               <div className="mb-1">
                 <JobIdLink jobID={job.jobID} onClick={onOpenJob} />
               </div>
-              <div className="mb-2 text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground">
                 {job.processID}
                 {job.submitter ? <> · {job.submitter}</> : null}
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {(job.tags || []).map((tag) => (
-                  <TagChip key={tag} tag={tag} />
-                ))}
               </div>
             </div>
           );

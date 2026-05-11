@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  ArrowDownToLine,
   ChevronDown,
   ChevronRight,
   Download,
@@ -16,20 +17,28 @@ import { Input } from "@/components/ui/input";
 
 const LEVELS = ["INFO", "WARN", "ERROR"];
 
-// Many compute plugins (e.g. LISFLOOD watchdog) leave the structured `level`
-// field empty and embed the level as a `[INFO]`/`[WARN]`/`[ERROR]` prefix in
-// the message. Pull it out so the level filter and color coding work.
-const LEVEL_PREFIX = /^\[(INFO|WARN(?:ING)?|ERROR)\] ?/i;
+// Many compute plugins leave the structured `level` field empty and embed the
+// level in the message itself. We've seen two prefix styles in the wild:
+//   "[INFO] foo"             — LISFLOOD watchdog
+//   "WARNING: foo" / "ERROR 45671: foo" — HMS / Java stack traces
+// Pull either out so the level filter and color coding work.
+const BRACKETED_LEVEL = /^\[(INFO|WARN(?:ING)?|ERROR)\] ?/i;
+const INLINE_LEVEL = /^(INFO|WARN(?:ING)?|ERROR)\b[: ]?/i;
 
 function normalizeLogEntry(entry) {
   const rawMsg = entry?.msg || "";
-  const match = rawMsg.match(LEVEL_PREFIX);
   let level = (entry?.level || "").toUpperCase();
   let msg = rawMsg;
-  if (match) {
-    msg = rawMsg.slice(match[0].length);
-    if (!level) level = match[1].toUpperCase();
+
+  const bracket = rawMsg.match(BRACKETED_LEVEL);
+  if (bracket) {
+    msg = rawMsg.slice(bracket[0].length);
+    if (!level) level = bracket[1].toUpperCase();
+  } else if (!level) {
+    const inline = rawMsg.match(INLINE_LEVEL);
+    if (inline) level = inline[1].toUpperCase();
   }
+
   if (level === "WARNING") level = "WARN";
   if (!level) level = "INFO";
   return { ...entry, level, msg };
@@ -40,7 +49,7 @@ export default function LogsTab({ jobID, jobStatus }) {
   const [search, setSearch] = useState("");
   const [enabledLevels, setEnabledLevels] = useState(() => new Set(LEVELS));
   const [collapsed, setCollapsed] = useState(() => new Set());
-  const [tail, setTail] = useState(true);
+  const [autoScroll, setAutoScroll] = useState(true);
   const scrollRef = useRef(null);
 
   const { data, isLoading, isError, error } = useJobLogsQuery(jobID, {
@@ -48,10 +57,23 @@ export default function LogsTab({ jobID, jobStatus }) {
   });
 
   const allLogs = useMemo(() => {
+    // Real Sepex returns `container_logs`; the mock layer returns `process_logs`.
+    // Accept either so both backends render.
     const raw =
-      stream === "process" ? data?.process_logs || [] : data?.server_logs || [];
+      stream === "process"
+        ? data?.process_logs || data?.container_logs || []
+        : data?.server_logs || [];
     return raw.map(normalizeLogEntry);
   }, [data, stream]);
+
+  const levelCounts = useMemo(() => {
+    const counts = { INFO: 0, WARN: 0, ERROR: 0 };
+    for (const log of allLogs) {
+      const level = (log.level || "INFO").toUpperCase();
+      if (counts[level] !== undefined) counts[level] += 1;
+    }
+    return counts;
+  }, [allLogs]);
 
   const groups = useMemo(
     () => [
@@ -82,15 +104,14 @@ export default function LogsTab({ jobID, jobStatus }) {
     0
   );
 
-  // Tail-on-scroll: when the toggle is on, scroll the viewport to the bottom
-  // any time the visible log count changes. Users who want to scroll back
-  // through history just click Tail off.
+  // Pin the viewport to the latest log whenever new lines arrive. Users who
+  // want to scroll back through history just toggle Auto-scroll off.
   useEffect(() => {
-    if (!tail) return;
+    if (!autoScroll) return;
     const el = scrollRef.current;
     if (!el) return;
     el.scrollTop = el.scrollHeight;
-  }, [tail, flatFilteredCount, stream]);
+  }, [autoScroll, flatFilteredCount, stream]);
 
   const toggleLevel = (level) => {
     setEnabledLevels((prev) => {
@@ -159,19 +180,23 @@ export default function LogsTab({ jobID, jobStatus }) {
         <div className="flex flex-wrap gap-2">
           {LEVELS.map((level) => {
             const active = enabledLevels.has(level);
+            const count = levelCounts[level] ?? 0;
             return (
               <button
                 type="button"
                 key={level}
                 onClick={() => toggleLevel(level)}
-                className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
+                disabled={count === 0}
+                className={`inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                   active
                     ? "bg-accent text-accent-foreground"
                     : "bg-muted text-muted-foreground hover:bg-muted/80"
                 }`}
                 aria-pressed={active}
+                title={`${count} ${level.toLowerCase()} line${count === 1 ? "" : "s"} in this stream`}
               >
-                {level}
+                <span>{level}</span>
+                <span className="tabular-nums opacity-70">{count}</span>
               </button>
             );
           })}
@@ -192,11 +217,13 @@ export default function LogsTab({ jobID, jobStatus }) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setTail((t) => !t)}
-            className={tail ? "bg-accent" : ""}
-            aria-pressed={tail}
+            onClick={() => setAutoScroll((v) => !v)}
+            className={`gap-2 ${autoScroll ? "bg-accent" : ""}`}
+            aria-pressed={autoScroll}
+            title="Pin the viewport to the latest log as new lines arrive"
           >
-            Tail
+            <ArrowDownToLine className="h-4 w-4" />
+            Auto-scroll
           </Button>
           <Button
             variant="outline"
@@ -264,11 +291,6 @@ export default function LogsTab({ jobID, jobStatus }) {
             })
           )}
         </div>
-      </div>
-
-      <div className="text-xs text-muted-foreground">
-        * Progress percentages parsed from{" "}
-        <span className="font-mono">process_logs[]</span>
       </div>
     </div>
   );

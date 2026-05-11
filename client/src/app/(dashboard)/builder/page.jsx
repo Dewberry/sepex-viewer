@@ -1,44 +1,36 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { LayoutGrid } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import ActionBar from "@/app/(dashboard)/builder/_components/ActionBar";
-import ExecutionModeCard from "@/app/(dashboard)/builder/_components/ExecutionModeCard";
 import InputsEditor from "@/app/(dashboard)/builder/_components/InputsEditor";
 import PayloadPreview from "@/app/(dashboard)/builder/_components/PayloadPreview";
 import ProcessInfoCard from "@/app/(dashboard)/builder/_components/ProcessInfoCard";
 import ProcessPicker from "@/app/(dashboard)/builder/_components/ProcessPicker";
-import RecentPayloadsPopover from "@/app/(dashboard)/builder/_components/RecentPayloadsPopover";
 import SubmitterCard from "@/app/(dashboard)/builder/_components/SubmitterCard";
 import TagsCard from "@/app/(dashboard)/builder/_components/TagsCard";
 import usePayloadForm from "@/app/(dashboard)/builder/_hooks/usePayloadForm";
 import useProcessDetailQuery from "@/app/(dashboard)/builder/_hooks/useProcessDetailQuery";
 import useProcessesQuery from "@/app/(dashboard)/builder/_hooks/useProcessesQuery";
-import useRecentJobsQuery from "@/app/(dashboard)/builder/_hooks/useRecentJobsQuery";
 import useSavedTemplates from "@/app/(dashboard)/builder/_hooks/useSavedTemplates";
 import useSubmitJobMutation from "@/app/(dashboard)/builder/_hooks/useSubmitJobMutation";
 import { buildPayload } from "@/app/(dashboard)/builder/_utils/schema";
 import { Form } from "@/components/ui/form";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getJob } from "@/lib/sepex";
 
 const DEFAULT_USER_EMAIL =
   process.env.NEXT_PUBLIC_SEPEX_USER_EMAIL || "dev@dewberry.local";
 
 export default function BuilderPage() {
-  const router = useRouter();
   const { data: session } = useSession();
   const sessionEmail = session?.user?.email || DEFAULT_USER_EMAIL;
 
   const [selectedProcessId, setSelectedProcessId] = useState(null);
   const [editorTab, setEditorTab] = useState("form");
-  const [executionMode, setExecutionMode] = useState("async");
   const [submitter, setSubmitter] = useState(sessionEmail);
   const [tags, setTags] = useState([]);
-  const [showRecent, setShowRecent] = useState(false);
 
   useEffect(() => {
     if (session?.user?.email) setSubmitter(session.user.email);
@@ -52,9 +44,6 @@ export default function BuilderPage() {
 
   const processDetailQuery = useProcessDetailQuery(selectedProcessId);
   const processDetail = processDetailQuery.data;
-
-  const recentJobsQuery = useRecentJobsQuery(sessionEmail);
-  const recentJobs = recentJobsQuery.data?.jobs || [];
 
   const {
     templates,
@@ -86,27 +75,6 @@ export default function BuilderPage() {
     resetAll();
   };
 
-  const applyLoadedPayload = (inputs, nextTags, processID) => {
-    setSelectedProcessId(processID || null);
-    loadInputs(inputs);
-    setTags(nextTags || []);
-  };
-
-  const handleUseRecent = async (job) => {
-    setShowRecent(false);
-    let inputs = job.inputs;
-    if (!inputs) {
-      try {
-        const full = await getJob(job.jobID);
-        inputs = full?.inputs || {};
-      } catch (err) {
-        toast.error(err?.message || "Could not load that payload");
-        return;
-      }
-    }
-    applyLoadedPayload(inputs, job.tags || [], job.processID);
-  };
-
   const handleSaveTemplate = (name) => {
     saveTemplate({
       name,
@@ -118,19 +86,21 @@ export default function BuilderPage() {
   };
 
   const handleLoadTemplate = (template) => {
-    applyLoadedPayload(
-      template.inputs || {},
-      template.tags || [],
-      template.processID
-    );
+    setSelectedProcessId(template.processID || null);
+    loadInputs(template.inputs || {});
+    setTags(template.tags || []);
   };
 
   const triggerSubmit = form.handleSubmit((values) => {
     if (!selectedProcessId) return;
+    // Real Sepex processes today only advertise `async-execute` in their
+    // jobControlOptions, so the Viewer submits async-only. Templates and the
+    // Builder form remain sync-agnostic — flip this if/when the API exposes
+    // sync support per process.
     submitMutation.mutate({
       processID: selectedProcessId,
       payload: buildPayload(processDetail, values, tags),
-      async: executionMode === "async",
+      async: true,
       userEmail: submitter
     });
   });
@@ -144,15 +114,6 @@ export default function BuilderPage() {
             Compose, validate, and submit job payloads
           </p>
         </div>
-        <RecentPayloadsPopover
-          open={showRecent}
-          onOpenChange={setShowRecent}
-          jobs={recentJobs}
-          isLoading={recentJobsQuery.isLoading}
-          isError={recentJobsQuery.isError}
-          onUse={handleUseRecent}
-          onViewAll={() => router.push("/jobs")}
-        />
       </div>
 
       <ProcessPicker
@@ -199,10 +160,6 @@ export default function BuilderPage() {
                   setTags((prev) => (prev.includes(t) ? prev : [...prev, t]))
                 }
                 onRemove={(t) => setTags((prev) => prev.filter((x) => x !== t))}
-              />
-              <ExecutionModeCard
-                mode={executionMode}
-                onChange={setExecutionMode}
               />
               <ActionBar
                 canSave={Boolean(selectedProcessId)}

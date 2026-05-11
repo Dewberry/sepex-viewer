@@ -19,8 +19,8 @@ export default function JobDetailDrawer({ jobID, open, onOpenChange }) {
       >
         <SheetTitle className="sr-only">Job details</SheetTitle>
         <SheetDescription className="sr-only">
-          Logs, results, metadata, and inputs for this job. Use the link above
-          to open the full page.
+          Logs, results, and metadata for this job. Use the link above to open
+          the full page.
         </SheetDescription>
         {jobID ? (
           <>

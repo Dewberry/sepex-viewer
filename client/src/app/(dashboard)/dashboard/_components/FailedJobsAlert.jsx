@@ -4,14 +4,9 @@ import Link from "next/link";
 import { AlertTriangle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getCompactRelativeTime } from "@/lib/time";
 
 const MAX_ROWS = 3;
-
-function formatTime(updated) {
-  if (!updated) return "—";
-  const d = new Date(updated);
-  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleTimeString();
-}
 
 export default function FailedJobsAlert({ jobs, isLoading, isError }) {
   if (isLoading) {
@@ -67,7 +62,7 @@ export default function FailedJobsAlert({ jobs, isLoading, isError }) {
               </Link>
               <div className="truncate text-xs text-muted-foreground">
                 {job.processID || "—"} · {job.submitter || "—"} ·{" "}
-                {formatTime(job.updated)}
+                {getCompactRelativeTime(job.updated) || "—"}
               </div>
               {job.lastErrorMessage ? (
                 <div className="mt-1 truncate text-xs text-status-failed/90">

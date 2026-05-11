@@ -4,32 +4,55 @@ import { Download } from "lucide-react";
 import useJobResultsQuery from "@/app/(dashboard)/jobs/[jobID]/_hooks/useJobResultsQuery";
 import { Button } from "@/components/ui/button";
 
-// The Sepex API returns results in one of two shapes depending on the OGC
-// negotiation: a flat array of { id|name, href, mediaType } or an object map
-// keyed by output name. Normalize defensively so the UI doesn't care.
+// The Sepex API returns results in a few shapes depending on the backend:
+//   • Real Sepex:       { outputs: { links: [{href,title,type,rel}], results: [{href,title}] } }
+//   • OGC array form:   [{ id|name, href, mediaType }, …]
+//   • OGC map form:     { outputName: { href, mediaType }, … }   (current mock layer)
+// Normalize defensively so the UI doesn't care.
+function fromArray(arr) {
+  return arr
+    .map((entry) => ({
+      name: entry.title || entry.id || entry.name || entry.key || "(unnamed)",
+      href: entry.href || entry.value?.href,
+      type:
+        entry.mediaType ||
+        entry.type ||
+        entry.value?.mediaType ||
+        entry.value?.type
+    }))
+    .filter((e) => e.href || e.type);
+}
+
 function normalizeResults(data) {
   if (!data) return [];
-  if (Array.isArray(data)) {
-    return data
-      .map((entry) => ({
-        name: entry.id || entry.name || entry.key || "(unnamed)",
-        href: entry.href || entry.value?.href,
-        type:
-          entry.mediaType ||
-          entry.type ||
-          entry.value?.mediaType ||
-          entry.value?.type
-      }))
-      .filter((e) => e.href || e.type);
-  }
-  if (typeof data === "object") {
-    return Object.entries(data).map(([name, value]) => ({
+  if (Array.isArray(data)) return fromArray(data);
+  if (typeof data !== "object") return [];
+
+  // Real Sepex envelope. Prefer `links` (presigned HTTPS URLs the browser can
+  // open) over `results` (s3:// URIs that need credentials).
+  if (data.outputs && typeof data.outputs === "object") {
+    if (Array.isArray(data.outputs.links) && data.outputs.links.length > 0) {
+      return fromArray(data.outputs.links);
+    }
+    if (
+      Array.isArray(data.outputs.results) &&
+      data.outputs.results.length > 0
+    ) {
+      return fromArray(data.outputs.results);
+    }
+    // Fall through to treat data.outputs as an OGC map.
+    return Object.entries(data.outputs).map(([name, value]) => ({
       name,
       href: value?.href,
       type: value?.mediaType || value?.type
     }));
   }
-  return [];
+
+  return Object.entries(data).map(([name, value]) => ({
+    name,
+    href: value?.href,
+    type: value?.mediaType || value?.type
+  }));
 }
 
 export default function ResultsTab({ jobID, jobStatus }) {

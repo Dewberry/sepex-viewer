@@ -16,7 +16,7 @@ import useSelectedJobUrlSync from "@/app/(dashboard)/jobs/_hooks/useSelectedJobU
 import buildJobsQueryParams from "@/app/(dashboard)/jobs/_utils/buildJobsQueryParams";
 import { ACTIVE_STATUSES, listProcesses } from "@/lib/sepex";
 
-const FILTER_KEYS = ["search", "processID", "status", "submitter", "tags"];
+const FILTER_KEYS = ["search", "processID", "status", "submitter"];
 const EMPTY_FILTERS = Object.fromEntries(FILTER_KEYS.map((k) => [k, ""]));
 
 const filtersFromSearchParams = (sp) =>
@@ -49,13 +49,7 @@ function JobsPageInner() {
   // Reset to first page whenever a server-side filter or page size changes.
   useEffect(() => {
     setOffset(0);
-  }, [
-    filters.processID,
-    filters.status,
-    filters.submitter,
-    filters.tags,
-    pageSize
-  ]);
+  }, [filters.processID, filters.status, filters.submitter, pageSize]);
 
   const queryParams = useMemo(
     () => buildJobsQueryParams(filters, pageSize, offset),
