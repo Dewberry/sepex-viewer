@@ -1,39 +1,74 @@
 import { z } from "zod";
 
-// TODO: deeper schema derivation. For v1 we coerce strings/integers and treat
-// object/list as freeform — JSON parsing in the textarea is the only validation.
+// Sepex uses "value" as a catch-all for any literal; in practice all the
+// processes that use it (fdt, pyecho) expect a free-form string. Treat it
+// the same as "string" so the user gets a text input instead of a JSON
+// textarea demanding quoted strings.
+export const isTextLike = (dataType) =>
+  dataType === "string" || dataType === "value";
+
+export const isMultiOccurrence = (input) => (input.maxOccurs ?? 1) > 1;
+
+function fieldFor(input) {
+  const dataType = input.input?.literalDataDomain?.dataType;
+  const required = (input.minOccurs || 0) > 0;
+  const multi = isMultiOccurrence(input);
+
+  if (multi) {
+    // Multi-occurrence is rendered as a multi-line textarea (one value per
+    // line); the form stores string[]. Integer arrays get coerced in
+    // buildPayload at the submission boundary.
+    const arr = z.array(z.string().min(1));
+    return required ? arr.min(1) : arr.optional();
+  }
+
+  if (dataType === "integer") {
+    const numeric = z.coerce.number();
+    return required ? numeric : numeric.optional();
+  }
+
+  if (isTextLike(dataType)) {
+    const str = z.string();
+    return required ? str.min(1) : str.optional();
+  }
+
+  // object / unknown — kept as JSON textarea, validated leniently
+  return required
+    ? z.any().refine((v) => v != null && v !== "")
+    : z.any().optional();
+}
+
 export function buildZodSchema(processInputs) {
   if (!processInputs?.length) return z.object({});
   const shape = {};
   for (const input of processInputs) {
-    const dataType = input.input?.literalDataDomain?.dataType;
-    const required = (input.minOccurs || 0) > 0;
-    let field;
-    if (dataType === "string") {
-      field = z.string();
-      field = required ? field.min(1) : field.optional();
-    } else if (dataType === "integer") {
-      const numeric = z.coerce.number();
-      field = required ? numeric : numeric.optional();
-    } else {
-      field = required
-        ? z.any().refine((v) => v != null && v !== "")
-        : z.any().optional();
-    }
-    shape[input.id] = field;
+    shape[input.id] = fieldFor(input);
   }
   return z.object(shape);
 }
 
 export function buildPayload(processDetail, values, tags) {
   const payload = { inputs: {} };
-  const sourceInputs = processDetail?.inputs?.length
-    ? processDetail.inputs.map((i) => i.id)
+  const inputs = processDetail?.inputs || [];
+  const inputMap = new Map(inputs.map((i) => [i.id, i]));
+  const sourceIds = inputs.length
+    ? inputs.map((i) => i.id)
     : Object.keys(values || {});
-  for (const id of sourceInputs) {
+
+  for (const id of sourceIds) {
     const v = values?.[id];
     if (v === undefined || v === null || v === "") continue;
-    payload.inputs[id] = v;
+    if (Array.isArray(v) && v.length === 0) continue;
+
+    const meta = inputMap.get(id);
+    const dataType = meta?.input?.literalDataDomain?.dataType;
+    const multi = meta ? isMultiOccurrence(meta) : false;
+
+    if (multi && dataType === "integer" && Array.isArray(v)) {
+      payload.inputs[id] = v.map((x) => Number(x));
+    } else {
+      payload.inputs[id] = v;
+    }
   }
   if (tags?.length) payload.tags = tags;
   return payload;

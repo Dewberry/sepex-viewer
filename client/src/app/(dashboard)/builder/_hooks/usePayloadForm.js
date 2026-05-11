@@ -37,7 +37,9 @@ export default function usePayloadForm({ processDetail, tags }) {
   const requiredCount = requiredInputs.length;
   const filledRequiredCount = requiredInputs.filter((i) => {
     const v = watchedValues[i.id];
-    return v !== undefined && v !== null && v !== "";
+    if (v === undefined || v === null || v === "") return false;
+    if (Array.isArray(v) && v.length === 0) return false;
+    return true;
   }).length;
   const isFormValid =
     Boolean(processDetail) &&

@@ -1,6 +1,10 @@
 "use client";
 
 import { Controller } from "react-hook-form";
+import {
+  isMultiOccurrence,
+  isTextLike
+} from "@/app/(dashboard)/builder/_utils/schema";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -13,6 +17,7 @@ export default function DynamicInputField({
   const dataType = input.input?.literalDataDomain?.dataType;
   const valueDef = input.input?.literalDataDomain?.valueDefinition || {};
   const required = (input.minOccurs || 0) > 0;
+  const multi = isMultiOccurrence(input);
   const fieldId = `field-${input.id}`;
   const descriptionId = input.description ? `${fieldId}-desc` : undefined;
 
@@ -25,6 +30,11 @@ export default function DynamicInputField({
             *
           </span>
         )}
+        {multi ? (
+          <span className="ml-2 text-xs font-normal text-muted-foreground">
+            (one per line, up to {input.maxOccurs})
+          </span>
+        ) : null}
       </label>
       {input.description && (
         <p id={descriptionId} className="mb-2 text-xs text-muted-foreground">
@@ -36,7 +46,28 @@ export default function DynamicInputField({
         name={input.id}
         control={control}
         render={({ field }) => {
-          if (dataType === "string") {
+          if (multi) {
+            return (
+              <Textarea
+                id={fieldId}
+                rows={4}
+                value={Array.isArray(field.value) ? field.value.join("\n") : ""}
+                onChange={(e) => {
+                  const lines = e.target.value
+                    .split("\n")
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+                  field.onChange(lines.length ? lines : undefined);
+                }}
+                onBlur={field.onBlur}
+                placeholder={`One ${(input.title || input.id).toLowerCase()} per line…`}
+                className="font-mono"
+                aria-required={required || undefined}
+                aria-describedby={descriptionId}
+              />
+            );
+          }
+          if (isTextLike(dataType)) {
             return (
               <Input
                 {...field}
