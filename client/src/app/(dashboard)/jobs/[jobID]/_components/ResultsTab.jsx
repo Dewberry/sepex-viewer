@@ -5,22 +5,54 @@ import useJobResultsQuery from "@/app/(dashboard)/jobs/[jobID]/_hooks/useJobResu
 import { Button } from "@/components/ui/button";
 
 // The Sepex API returns results in a few shapes depending on the backend:
-//   • Real Sepex:       { outputs: { links: [{href,title,type,rel}], results: [{href,title}] } }
+//   • Async + downloadable files (hms-runner, dss_to_zarr):
+//       { outputs: { links: [{href,title,type,rel}], results: [{href,title}] } }
+//   • Sync + scalar (pyecho):
+//       { outputs: "<echoed string>" }
 //   • OGC array form:   [{ id|name, href, mediaType }, …]
-//   • OGC map form:     { outputName: { href, mediaType }, … }   (current mock layer)
+//   • OGC map form:     { outputName: { href, mediaType } | "scalar", … }   (mock)
 // Normalize defensively so the UI doesn't care.
+
 function fromArray(arr) {
   return arr
-    .map((entry) => ({
-      name: entry.title || entry.id || entry.name || entry.key || "(unnamed)",
-      href: entry.href || entry.value?.href,
-      type:
+    .map((entry) => {
+      const href = entry.href || entry.value?.href;
+      const type =
         entry.mediaType ||
         entry.type ||
         entry.value?.mediaType ||
-        entry.value?.type
-    }))
-    .filter((e) => e.href || e.type);
+        entry.value?.type;
+      const value =
+        href || type
+          ? undefined
+          : typeof entry.value !== "undefined"
+            ? entry.value
+            : undefined;
+      return {
+        name: entry.title || entry.id || entry.name || entry.key || "(unnamed)",
+        href,
+        type,
+        value
+      };
+    })
+    .filter((e) => e.href || e.type || typeof e.value !== "undefined");
+}
+
+function fromMap(map) {
+  return Object.entries(map).map(([name, v]) => {
+    if (v && typeof v === "object") {
+      const href = v.href || v.value?.href;
+      const type = v.mediaType || v.type || v.value?.mediaType || v.value?.type;
+      const value = href
+        ? undefined
+        : typeof v.value !== "undefined"
+          ? v.value
+          : undefined;
+      return { name, href, type, value };
+    }
+    // Scalar in the map (e.g. { message: "echoed string" })
+    return { name, value: v };
+  });
 }
 
 function normalizeResults(data) {
@@ -28,31 +60,22 @@ function normalizeResults(data) {
   if (Array.isArray(data)) return fromArray(data);
   if (typeof data !== "object") return [];
 
-  // Real Sepex envelope. Prefer `links` (presigned HTTPS URLs the browser can
-  // open) over `results` (s3:// URIs that need credentials).
-  if (data.outputs && typeof data.outputs === "object") {
-    if (Array.isArray(data.outputs.links) && data.outputs.links.length > 0) {
-      return fromArray(data.outputs.links);
-    }
-    if (
-      Array.isArray(data.outputs.results) &&
-      data.outputs.results.length > 0
-    ) {
-      return fromArray(data.outputs.results);
-    }
-    // Fall through to treat data.outputs as an OGC map.
-    return Object.entries(data.outputs).map(([name, value]) => ({
-      name,
-      href: value?.href,
-      type: value?.mediaType || value?.type
-    }));
+  // Real Sepex envelope.
+  if ("outputs" in data) {
+    const o = data.outputs;
+    if (o === null || o === undefined) return [];
+    // Scalar — pyecho-style sync response, single unnamed output.
+    if (typeof o !== "object") return [{ name: "output", value: o }];
+    if (Array.isArray(o)) return fromArray(o);
+    // hms-runner-style: prefer presigned HTTPS links over raw s3:// uris.
+    if (Array.isArray(o.links) && o.links.length > 0) return fromArray(o.links);
+    if (Array.isArray(o.results) && o.results.length > 0)
+      return fromArray(o.results);
+    return fromMap(o);
   }
 
-  return Object.entries(data).map(([name, value]) => ({
-    name,
-    href: value?.href,
-    type: value?.mediaType || value?.type
-  }));
+  // Legacy / mock layer: top-level object is itself the output map.
+  return fromMap(data);
 }
 
 export default function ResultsTab({ jobID, jobStatus }) {
@@ -87,31 +110,57 @@ export default function ResultsTab({ jobID, jobStatus }) {
 
   return (
     <div className="space-y-3">
-      {entries.map((entry) => (
-        <div
-          key={entry.name}
-          className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 p-4 transition-colors hover:bg-muted/50"
-        >
-          <div className="min-w-0 flex-1">
-            <div className="font-semibold">{entry.name}</div>
-            {entry.href ? (
-              <div className="truncate font-mono text-xs text-muted-foreground">
-                {entry.href}
+      {entries.map((entry) => {
+        const hasValue = typeof entry.value !== "undefined";
+        const displayValue = hasValue
+          ? typeof entry.value === "object"
+            ? JSON.stringify(entry.value, null, 2)
+            : String(entry.value)
+          : null;
+        return (
+          <div
+            key={entry.name}
+            className="rounded-lg border border-border bg-muted/30 p-4 transition-colors hover:bg-muted/50"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="font-semibold">{entry.name}</div>
+                {entry.href ? (
+                  <div className="truncate font-mono text-xs text-muted-foreground">
+                    {entry.href}
+                  </div>
+                ) : null}
+                {entry.type ? (
+                  <div className="text-xs text-muted-foreground">
+                    {entry.type}
+                  </div>
+                ) : null}
               </div>
-            ) : null}
-            {entry.type ? (
-              <div className="text-xs text-muted-foreground">{entry.type}</div>
+              {entry.href ? (
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  title="Open / download"
+                >
+                  <a
+                    href={entry.href}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    <Download className="h-4 w-4" />
+                  </a>
+                </Button>
+              ) : null}
+            </div>
+            {hasValue ? (
+              <pre className="mt-2 overflow-x-auto rounded bg-background/60 p-2 font-mono text-xs whitespace-pre-wrap">
+                {displayValue}
+              </pre>
             ) : null}
           </div>
-          {entry.href ? (
-            <Button asChild variant="ghost" size="sm" title="Open / download">
-              <a href={entry.href} target="_blank" rel="noreferrer noopener">
-                <Download className="h-4 w-4" />
-              </a>
-            </Button>
-          ) : null}
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
