@@ -32,7 +32,6 @@ export async function GET(request, { params }) {
     host: projected.host,
     hostJobID: projected.hostJobID,
     mode: projected.mode,
-    ...(projected.message ? { message: projected.message } : null),
     inputs: projected.inputs
   });
 }

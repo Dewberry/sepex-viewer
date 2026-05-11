@@ -199,7 +199,14 @@ const SUBMITTERS = [
   "ana.rivera@example.com",
   "lee.pham@example.com",
   "j.okafor@example.com",
-  "m.santos@example.com"
+  "m.santos@example.com",
+  "k.nguyen@example.com",
+  "r.patel@example.com",
+  "s.chen@example.com",
+  "t.williams@example.com",
+  "h.alvarez@example.com",
+  "d.brown@example.com",
+  "p.gupta@example.com"
 ];
 
 const PROCESS_IDS = PROCESSES.map((p) => p.id);
@@ -414,130 +421,154 @@ function resultsFor(processID, i) {
   }
 }
 
-function metadataFor(processID, i) {
+function hexDigest(i) {
+  // 64-char hex string seeded by i — deterministic image digest stand-in.
+  // Uses Math.imul to keep multiplications in 32-bit space without precision
+  // loss (plain `*` collapses bits when the product overflows 2^53).
+  let s = "";
+  let n = Math.imul(i + 1, 2654435761) >>> 0;
+  for (let k = 0; k < 64; k += 1) {
+    n = (Math.imul(n, 1664525) + 1013904223) >>> 0;
+    s += ((n >>> ((k * 3) & 28)) & 0xf).toString(16);
+  }
+  return s;
+}
+
+function metadataFor(processID, i, finishedAt) {
+  // OGC API – Processes job metadata shape. Matches the Sepex Go struct in
+  // /Users/curtis/Documents/code/sepex/api/jobs/metadata.go so the design
+  // branch reflects what the real API returns today.
+  const proc = PROCESSES.find((p) => p.id === processID);
+  const endedAt = new Date(finishedAt);
+  const startedAt = new Date(finishedAt - 60_000 - (i % 120) * 1000);
+  const version = proc?.version || "1.0.0";
   return {
-    runtimeSeconds: 60 + i * 7,
-    workerHost: i % 2 === 0 ? "docker-1" : "docker-2",
-    pluginVersion: "1.4.2",
-    inputs: makeInputs(processID, i)
+    "@context": "https://schemas.opengis.net/ogcapi/processes/part1/1.0",
+    apiJobId: `mock-${i}`,
+    process: {
+      processId: processID,
+      processVersion: version
+    },
+    image: {
+      imageURI: `ghcr.io/dewberry/${processID}:${version}`,
+      imageDigest: `sha256:${hexDigest(i)}`
+    },
+    commands: [processID, "--config", "/etc/sepex/job.yml"],
+    generatedAtTime: endedAt.toISOString(),
+    startedAtTime: startedAt.toISOString(),
+    endedAtTime: endedAt.toISOString()
   };
 }
 
-// Distribute statuses to populate Dashboard buckets meaningfully.
-function statusForIndex(i) {
-  // 0..2 within last hour: 2 running, 1 accepted
-  if (i < 3) return ["running", "running", "accepted"][i];
-  // 3..6 within last 6h: more accepted/running mixed with finished
-  if (i < 7) return ["successful", "running", "accepted", "successful"][i - 3];
-  // 7..14 within last 24h
-  if (i < 15) {
-    return [
-      "successful",
-      "successful",
-      "failed",
-      "successful",
-      "dismissed",
-      "successful",
-      "failed",
-      "successful"
-    ][i - 7];
-  }
-  // 15..29 within last 7d
-  if (i < 30) {
-    return [
-      "successful",
-      "successful",
-      "failed",
-      "successful",
-      "successful",
-      "dismissed",
-      "successful",
-      "lost",
-      "successful",
-      "failed",
-      "successful",
-      "successful",
-      "dismissed",
-      "successful",
-      "failed"
-    ][i - 15];
-  }
-  // 30..49 within last 30d
-  return [
-    "successful",
-    "failed",
-    "successful",
-    "successful",
-    "lost",
-    "successful",
-    "successful",
-    "dismissed",
-    "successful",
-    "failed",
-    "successful",
-    "successful",
-    "successful",
-    "failed",
-    "dismissed",
-    "successful",
-    "successful",
-    "lost",
-    "successful",
-    "failed"
-  ][i - 30];
+// Seeded LCG so screenshots are reproducible across `next dev` restarts.
+function makeRng(seed) {
+  let s = seed >>> 0;
+  return () => {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    return s / 0x100000000;
+  };
 }
 
-function timeForIndex(i, now) {
-  // i=0..2 minutes ago, i=3..6 hours ago, etc.
-  if (i < 3) return now - (i + 1) * 5 * 60 * 1000;
-  if (i < 7) return now - (i - 2) * HOUR;
-  if (i < 15) return now - (8 + (i - 7) * 2) * HOUR;
-  if (i < 30)
-    return now - (1 + Math.floor((i - 15) / 2)) * DAY - (i % 2) * 6 * HOUR;
-  return now - (8 + (i - 30)) * DAY - (i % 3) * 4 * HOUR;
+// Status weights vary by how recent a job is. Recent jobs are more likely to
+// still be running; old jobs have all terminated.
+function pickStatus(rng, ageMs) {
+  const r = rng();
+  if (ageMs < HOUR) {
+    if (r < 0.55) return "running";
+    if (r < 0.85) return "accepted";
+    if (r < 0.95) return "successful";
+    return "failed";
+  }
+  if (ageMs < DAY) {
+    if (r < 0.04) return "running";
+    if (r < 0.06) return "accepted";
+    if (r < 0.91) return "successful";
+    if (r < 0.96) return "failed";
+    if (r < 0.99) return "dismissed";
+    return "lost";
+  }
+  if (ageMs < 7 * DAY) {
+    if (r < 0.92) return "successful";
+    if (r < 0.96) return "failed";
+    if (r < 0.99) return "dismissed";
+    return "lost";
+  }
+  if (r < 0.93) return "successful";
+  if (r < 0.97) return "failed";
+  if (r < 0.995) return "dismissed";
+  return "lost";
 }
+
+// Returns a job's `updated` timestamp, biased so a meaningful number of jobs
+// land in each Dashboard window (24h / 7d / 30d).
+function nextTimestamp(now, rng) {
+  // Buckets: ~1% in last 1h, ~4% in last 24h, ~15% in last 7d, rest in 30d.
+  const r = rng();
+  if (r < 0.01) return now - rng() * HOUR;
+  if (r < 0.05) return now - HOUR - rng() * (DAY - HOUR);
+  if (r < 0.2) return now - DAY - rng() * (7 * DAY - DAY);
+  return now - 7 * DAY - rng() * (23 * DAY);
+}
+
+const TOTAL_SEED_JOBS = 5000;
 
 function buildSeedJobs(now) {
+  const rng = makeRng(0xc0ffee);
   const jobs = [];
-  for (let i = 0; i < 50; i += 1) {
-    const status = statusForIndex(i);
-    const processID = pick(PROCESS_IDS, i);
-    const updated = timeForIndex(i, now);
-    // Each seed job ran for 90s before reaching its final updated state.
-    // For active jobs, `created` is still earlier — `getElapsed` will compute
-    // (now - created) on the client side.
+  for (let i = 0; i < TOTAL_SEED_JOBS; i += 1) {
+    const updated = nextTimestamp(now, rng);
+    const ageMs = now - updated;
+    const status = pickStatus(rng, ageMs);
+    const processID = PROCESS_IDS[Math.floor(rng() * PROCESS_IDS.length)];
+    const submitter = SUBMITTERS[Math.floor(rng() * SUBMITTERS.length)];
     const created = updated - 90_000;
-    const jobID = `mock-${String(i).padStart(4, "0")}-${processID}`;
+    const jobID = `mock-${String(i).padStart(5, "0")}-${processID}`;
+    const reasonIdx = Math.floor(rng() * FAIL_REASONS.length);
     jobs.push({
       type: "process",
       jobID,
       processID,
       status,
-      submitter: pick(SUBMITTERS, i),
+      submitter,
       created: new Date(created).toISOString(),
       updated: new Date(updated).toISOString(),
       tags: makeTags(i),
       host: i % 2 === 0 ? "docker" : "subprocess",
       hostJobID: `${i % 2 === 0 ? "container" : "pid"}-${10000 + i}`,
       mode: "async",
-      message:
-        status === "failed" ? FAIL_REASONS[i % FAIL_REASONS.length] : undefined,
+      lastErrorMessage:
+        status === "failed" ? FAIL_REASONS[reasonIdx] : undefined,
       inputs: makeInputs(processID, i),
-      _submittedAt: updated // not exposed; used for time progression of new submissions
+      _submittedAt: updated
     });
   }
+  // Sort newest first so the in-memory store is already in display order.
+  jobs.sort((a, b) => new Date(b.updated) - new Date(a.updated));
   return jobs;
 }
 
+function jobIndexFromID(jobID) {
+  // jobID format: `mock-NNNNN-<processID>` — digits start at offset 5.
+  const m = /^mock-(\d+)-/.exec(jobID);
+  return m ? parseInt(m[1], 10) : 0;
+}
+
+// Only generate logs / results / metadata for the most recent N jobs.
+// The PM demo only drills into a handful of jobs; the other thousands exist
+// so the Dashboard charts and pagination look realistic. Keeping seed data
+// O(1000s) instead of O(50k log entries) keeps boot time fast.
+const EAGER_DETAIL_COUNT = 250;
+
 function buildSeedLogs(jobs) {
   const logs = {};
-  for (const job of jobs) {
+  const slice = jobs.slice(0, EAGER_DETAIL_COUNT);
+  for (const job of slice) {
     const finishedAt = new Date(job.updated).getTime();
     logs[job.jobID] = {
       process_logs: processLogsFor(
         job.status,
         job.processID,
-        parseInt(job.jobID.slice(5, 9), 10) || 0,
+        jobIndexFromID(job.jobID),
         finishedAt
       ),
       server_logs: serverLogsFor(job.status, job.jobID, finishedAt)
@@ -549,12 +580,13 @@ function buildSeedLogs(jobs) {
 function buildSeedResults(jobs) {
   const results = {};
   const metadata = {};
-  for (const job of jobs) {
-    const i = parseInt(job.jobID.slice(5, 9), 10) || 0;
-    if (job.status === "successful") {
-      results[job.jobID] = resultsFor(job.processID, i);
-      metadata[job.jobID] = metadataFor(job.processID, i);
-    }
+  const slice = jobs.slice(0, EAGER_DETAIL_COUNT);
+  for (const job of slice) {
+    if (job.status !== "successful") continue;
+    const i = jobIndexFromID(job.jobID);
+    const finishedAt = new Date(job.updated).getTime();
+    results[job.jobID] = resultsFor(job.processID, i);
+    metadata[job.jobID] = metadataFor(job.processID, i, finishedAt);
   }
   return { results, metadata };
 }
@@ -570,7 +602,7 @@ function applyScenario(jobs) {
     return jobs.map((j, i) => ({
       ...j,
       status: "failed",
-      message: FAIL_REASONS[i % FAIL_REASONS.length]
+      lastErrorMessage: FAIL_REASONS[i % FAIL_REASONS.length]
     }));
   }
   return jobs;
