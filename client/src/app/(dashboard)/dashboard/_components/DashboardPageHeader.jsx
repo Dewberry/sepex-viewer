@@ -1,0 +1,40 @@
+"use client";
+
+import { RefreshCw } from "lucide-react";
+import TimeRangePicker from "@/app/(dashboard)/dashboard/_components/TimeRangePicker";
+import { Button } from "@/components/ui/button";
+import { PROPOSED_API_ENABLED } from "@/lib/featureFlags";
+
+export default function DashboardPageHeader({
+  range,
+  onRangeChange,
+  isFetching,
+  onRefresh
+}) {
+  return (
+    <div className="flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {PROPOSED_API_ENABLED
+            ? "System health and recent activity at a glance."
+            : "Most recent 100 jobs (current API pagination cap), windowed to the selected range."}
+        </p>
+      </div>
+      <div className="flex items-center gap-3">
+        <TimeRangePicker value={range} onChange={onRangeChange} />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onRefresh}
+          aria-label="Refresh dashboard"
+          className="h-8 w-8"
+        >
+          <RefreshCw
+            className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+          />
+        </Button>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,32 @@
+import "@/app/styles/globals.css";
+import { jetbrainsMono, openSans } from "@/app/styles/fonts";
+import Providers from "@/app/providers";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+export const metadata = {
+  title: {
+    default: "Sepex Viewer",
+    template: "%s · Sepex Viewer"
+  },
+  description: "Job dashboard and payload builder for the Sepex API"
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${openSans.variable} ${jetbrainsMono.variable} font-sans antialiased`}
+      >
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          Skip to main content
+        </a>
+        <Providers>
+          <TooltipProvider>{children}</TooltipProvider>
+        </Providers>
+      </body>
+    </html>
+  );
+}

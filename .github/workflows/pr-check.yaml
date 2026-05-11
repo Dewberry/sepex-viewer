@@ -1,0 +1,16 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "client/**"
+      - ".github/workflows/**"
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    uses: ./.github/workflows/lint.yaml
