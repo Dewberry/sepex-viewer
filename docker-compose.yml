@@ -46,6 +46,11 @@ services:
       # separate server-only env var pointing at http://sepex:5050.
       NEXT_PUBLIC_SEPEX_BASE_URL: http://localhost:5050
       NEXT_PUBLIC_SEPEX_USER_EMAIL: dev@dewberry.local
+      # Enables UI surfaces that depend on Sepex API additions from
+      # research/proposed-next-steps.md (Dashboard time-range picker, inline
+      # failed-job reasons, ⌘K command palette, total/pages pagination).
+      # Leave "false" until those API changes ship.
+      NEXT_PUBLIC_ENABLE_PROPOSED_API: 'false'
       NEXT_TELEMETRY_DISABLED: '1'
       WATCHPACK_POLLING: 'true'
       CHOKIDAR_USEPOLLING: 'true'

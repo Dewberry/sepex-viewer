@@ -142,7 +142,7 @@ function JobsPageInner() {
         />
         <PaginationFooter
           page={page}
-          totalPages={null}
+          totalPages={jobsQuery.data?.pages || null}
           pageSize={pageSize}
           onPageSize={setPageSize}
           hasPrev={hasPrev}

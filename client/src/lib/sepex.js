@@ -131,11 +131,24 @@ export const listJobs = ({
   status,
   submitter,
   tags,
+  q,
+  updatedAfter,
+  updatedBefore,
   ...opts
 } = {}) =>
   request("/jobs", {
     ...opts,
-    query: { limit, offset, processID, status, submitter, tags }
+    query: {
+      limit,
+      offset,
+      processID,
+      status,
+      submitter,
+      tags,
+      q,
+      updatedAfter,
+      updatedBefore
+    }
   });
 
 export const getJob = (jobID, opts) => request(`/jobs/${jobID}`, opts);

@@ -3,6 +3,7 @@
 import { RefreshCw } from "lucide-react";
 import TimeRangePicker from "@/app/(dashboard)/dashboard/_components/TimeRangePicker";
 import { Button } from "@/components/ui/button";
+import { PROPOSED_API_ENABLED } from "@/lib/featureFlags";
 
 export default function DashboardPageHeader({
   range,
@@ -15,18 +16,17 @@ export default function DashboardPageHeader({
       <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          System health and recent activity at a glance.
+          {PROPOSED_API_ENABLED
+            ? "System health and recent activity at a glance."
+            : "KPIs and charts reflect the most recent 100 jobs (current API pagination cap)."}
         </p>
       </div>
       <div className="flex items-center gap-3">
-        <div className="flex flex-col items-end gap-1">
-          <TimeRangePicker value={range} onChange={onRangeChange} />
-          {range !== "24h" ? (
-            <span className="text-[11px] text-muted-foreground">
-              Best-effort — backend filtering pending
-            </span>
-          ) : null}
-        </div>
+        {PROPOSED_API_ENABLED ? (
+          <div className="flex flex-col items-end gap-1">
+            <TimeRangePicker value={range} onChange={onRangeChange} />
+          </div>
+        ) : null}
         <Button
           variant="ghost"
           size="icon"

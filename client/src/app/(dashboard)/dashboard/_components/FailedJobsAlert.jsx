@@ -41,6 +41,7 @@ export default function FailedJobsAlert({ jobs, isLoading, isError }) {
   }
 
   const visible = jobs.slice(0, MAX_ROWS);
+  const hasReasons = visible.some((j) => j.lastErrorMessage);
 
   return (
     <div className="rounded-lg border border-status-failed/30 bg-status-failed/5 p-4">
@@ -68,6 +69,11 @@ export default function FailedJobsAlert({ jobs, isLoading, isError }) {
                 {job.processID || "—"} · {job.submitter || "—"} ·{" "}
                 {formatTime(job.updated)}
               </div>
+              {job.lastErrorMessage ? (
+                <div className="mt-1 truncate text-xs text-status-failed/90">
+                  {job.lastErrorMessage}
+                </div>
+              ) : null}
             </div>
             <Button asChild variant="ghost" size="sm" className="text-xs">
               <Link href={`/jobs/${job.jobID}?tab=logs`}>View logs</Link>
@@ -88,10 +94,13 @@ export default function FailedJobsAlert({ jobs, isLoading, isError }) {
         </Link>
       </Button>
 
-      <div className="mt-2 text-xs text-muted-foreground">
-        * Reason from{" "}
-        <span className="font-mono">/jobs/&#123;id&#125;/logs</span>
-      </div>
+      {hasReasons ? null : (
+        <div className="mt-2 text-xs text-muted-foreground">
+          Reason requires fetching{" "}
+          <span className="font-mono">/jobs/&#123;id&#125;/logs</span> per job —
+          view a job to see why it failed.
+        </div>
+      )}
     </div>
   );
 }
