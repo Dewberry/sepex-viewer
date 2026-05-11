@@ -12,8 +12,6 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 
-const isDevBypass = process.env.NEXT_PUBLIC_DEV_BYPASS_AUTH === "true";
-
 export default function UserPopover() {
   const { data: session, status } = useSession();
   const user = session?.user;
@@ -34,16 +32,16 @@ export default function UserPopover() {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col gap-1">
             <span className="text-sm font-medium">
-              {user?.name || (isDevBypass ? "Dev User" : "Signed in")}
+              {user?.name || "Signed in"}
             </span>
             <span className="text-xs text-muted-foreground truncate">
-              {isDevBypass ? "Dev bypass" : user?.email || "—"}
+              {user?.email || "—"}
             </span>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          disabled={isDevBypass || status !== "authenticated"}
+          disabled={status !== "authenticated"}
           onSelect={() => signOut({ callbackUrl: "/" })}
         >
           <LogOut className="h-4 w-4" />
