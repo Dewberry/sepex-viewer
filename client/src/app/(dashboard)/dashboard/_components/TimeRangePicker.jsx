@@ -5,7 +5,7 @@ import { TIME_RANGES } from "@/app/(dashboard)/dashboard/_utils/timeRange";
 export default function TimeRangePicker({ value, onChange }) {
   return (
     <div
-      role="tablist"
+      role="group"
       aria-label="Time range"
       className="inline-flex items-center gap-0.5 rounded-lg bg-muted p-1"
     >
@@ -14,8 +14,8 @@ export default function TimeRangePicker({ value, onChange }) {
         return (
           <button
             key={range}
-            role="tab"
-            aria-selected={active}
+            type="button"
+            aria-pressed={active}
             onClick={() => onChange(range)}
             className={`rounded px-3 py-1.5 text-sm font-medium transition-colors ${
               active

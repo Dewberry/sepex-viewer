@@ -23,7 +23,11 @@ export default function RunSummaryCard({ job }) {
     <div className="rounded-lg border border-border bg-card p-4">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
         <div className="flex min-w-0 flex-1 items-start gap-3">
-          <StatusIcon status={job.status} className="h-5 w-5 shrink-0" />
+          <StatusIcon
+            status={job.status}
+            className="h-5 w-5 shrink-0"
+            label={`Status: ${job.status}`}
+          />
           <div className="min-w-0 flex-1 space-y-1">
             <button
               type="button"

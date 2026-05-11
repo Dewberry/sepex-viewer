@@ -110,7 +110,7 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <section className="relative flex min-h-[80vh] items-center overflow-hidden px-6 py-16 lg:py-24">
           <TopographicBackdrop />
           <div className="relative z-10 mx-auto w-full max-w-7xl">

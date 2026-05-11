@@ -45,7 +45,10 @@ export default function RecentActivityFeed({
                 className="-mx-2 flex items-center gap-3 rounded border-b border-border px-2 py-2 transition-colors last:border-0 hover:bg-accent/50"
               >
                 <span className="flex w-8 items-center justify-center">
-                  <StatusIcon status={job.status} />
+                  <StatusIcon
+                    status={job.status}
+                    label={`Status: ${job.status}`}
+                  />
                 </span>
                 <div className="min-w-0 flex-1">
                   <div
