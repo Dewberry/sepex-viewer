@@ -512,6 +512,15 @@ function nextTimestamp(now, rng) {
 
 const TOTAL_SEED_JOBS = 5000;
 
+// 8-char hex jobID — matches the format real Sepex emits, e.g. the
+// `c5h0g1e4` style in research/proposed-next-steps.md examples. Keeps
+// JobIdLink's slice(-8) display working.
+function makeJobID(i) {
+  let n = Math.imul(i + 1, 2654435761) >>> 0;
+  n = (Math.imul(n, 1664525) + 1013904223) >>> 0;
+  return n.toString(16).padStart(8, "0").slice(-8);
+}
+
 function buildSeedJobs(now) {
   const rng = makeRng(0xc0ffee);
   const jobs = [];
@@ -522,7 +531,7 @@ function buildSeedJobs(now) {
     const processID = PROCESS_IDS[Math.floor(rng() * PROCESS_IDS.length)];
     const submitter = SUBMITTERS[Math.floor(rng() * SUBMITTERS.length)];
     const created = updated - 90_000;
-    const jobID = `mock-${String(i).padStart(5, "0")}-${processID}`;
+    const jobID = makeJobID(i);
     const reasonIdx = Math.floor(rng() * FAIL_REASONS.length);
     jobs.push({
       type: "process",
@@ -539,18 +548,13 @@ function buildSeedJobs(now) {
       lastErrorMessage:
         status === "failed" ? FAIL_REASONS[reasonIdx] : undefined,
       inputs: makeInputs(processID, i),
+      _seedIndex: i,
       _submittedAt: updated
     });
   }
   // Sort newest first so the in-memory store is already in display order.
   jobs.sort((a, b) => new Date(b.updated) - new Date(a.updated));
   return jobs;
-}
-
-function jobIndexFromID(jobID) {
-  // jobID format: `mock-NNNNN-<processID>` — digits start at offset 5.
-  const m = /^mock-(\d+)-/.exec(jobID);
-  return m ? parseInt(m[1], 10) : 0;
 }
 
 // Only generate logs / results / metadata for the most recent N jobs.
@@ -568,7 +572,7 @@ function buildSeedLogs(jobs) {
       process_logs: processLogsFor(
         job.status,
         job.processID,
-        jobIndexFromID(job.jobID),
+        job._seedIndex ?? 0,
         finishedAt
       ),
       server_logs: serverLogsFor(job.status, job.jobID, finishedAt)
@@ -583,7 +587,7 @@ function buildSeedResults(jobs) {
   const slice = jobs.slice(0, EAGER_DETAIL_COUNT);
   for (const job of slice) {
     if (job.status !== "successful") continue;
-    const i = jobIndexFromID(job.jobID);
+    const i = job._seedIndex ?? 0;
     const finishedAt = new Date(job.updated).getTime();
     results[job.jobID] = resultsFor(job.processID, i);
     metadata[job.jobID] = metadataFor(job.processID, i, finishedAt);

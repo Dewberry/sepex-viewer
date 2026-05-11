@@ -8,7 +8,18 @@ const OUT_DIR = path.resolve(process.cwd(), "../research/screenshots/built");
 const VIEWPORT_DESKTOP = { width: 1440, height: 900 };
 const VIEWPORT_MOBILE = { width: 390, height: 844 }; // iPhone 14-class
 
-const JOB_ID = "mock-0008-ras-2d-mesh"; // a successful job in the mock seed
+async function pickSuccessfulJobID() {
+  const res = await fetch(
+    `${BASE_URL}/api/mock/jobs?status=successful&limit=1`
+  );
+  const body = await res.json();
+  if (!body.jobs?.[0]?.jobID) {
+    throw new Error("No successful jobs in the mock seed — bump fixtures?");
+  }
+  return body.jobs[0].jobID;
+}
+
+const JOB_ID = await pickSuccessfulJobID();
 
 const PAGES = [
   { id: "landing", path: "/" },
