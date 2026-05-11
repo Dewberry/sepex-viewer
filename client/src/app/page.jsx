@@ -95,10 +95,12 @@ export default function LandingPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="flex h-14 items-center border-b border-border bg-card px-6">
-        <div className="flex items-center gap-2 font-semibold">
-          <Activity className="h-5 w-5 text-primary" />
-          <span>Sepex Viewer</span>
+      <header className="border-b border-border bg-card px-6">
+        <div className="mx-auto flex h-14 max-w-7xl items-center">
+          <div className="flex items-center gap-2 font-semibold">
+            <Activity className="h-5 w-5 text-primary" />
+            <span>Sepex Viewer</span>
+          </div>
         </div>
       </header>
 
