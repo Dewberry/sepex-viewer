@@ -24,11 +24,7 @@ export async function maybeDelay(request) {
 
 export function maybeFailRandomly(routeName) {
   if (SCENARIO !== "error") return null;
-  const FAIL_ROUTES = new Set([
-    "GET /jobs",
-    "GET /admin/resources",
-    "GET /processes"
-  ]);
+  const FAIL_ROUTES = new Set(["GET /jobs", "GET /processes"]);
   if (!FAIL_ROUTES.has(routeName)) return null;
   return Response.json(
     { error: "mock error scenario", code: 503 },

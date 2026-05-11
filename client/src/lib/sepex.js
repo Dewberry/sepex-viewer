@@ -11,7 +11,6 @@
  *   GET    /jobs/{id}/results
  *   GET    /jobs/{id}/metadata
  *   DELETE /jobs/{id}
- *   GET    /admin/resources
  *
  * Submitter is identified via the X-SEPEX-User-Email header
  * (verified against ~/Documents/code/sepex/api/auth/keycloak.go).
@@ -159,8 +158,5 @@ export const getJobMetadata = (jobID, opts) =>
   request(`/jobs/${jobID}/metadata`, opts);
 export const dismissJob = (jobID, opts) =>
   request(`/jobs/${jobID}`, { ...opts, method: "DELETE" });
-
-// ── Admin ────────────────────────────────────────────────────
-export const getAdminResources = (opts) => request("/admin/resources", opts);
 
 export { SepexApiError };
