@@ -154,25 +154,27 @@ export default function LogsTab({ jobID, jobStatus }) {
           <button
             type="button"
             onClick={() => setStream("process")}
+            aria-pressed={stream === "process"}
             className={`inline-flex items-center gap-1 rounded px-3 py-1.5 text-xs font-medium transition-colors ${
               stream === "process"
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <Terminal className="h-3 w-3" />
+            <Terminal className="h-3 w-3" aria-hidden="true" />
             Process
           </button>
           <button
             type="button"
             onClick={() => setStream("server")}
+            aria-pressed={stream === "server"}
             className={`inline-flex items-center gap-1 rounded px-3 py-1.5 text-xs font-medium transition-colors ${
               stream === "server"
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <Server className="h-3 w-3" />
+            <Server className="h-3 w-3" aria-hidden="true" />
             Server
           </button>
         </div>
@@ -259,6 +261,7 @@ export default function LogsTab({ jobID, jobStatus }) {
           ) : (
             filteredGroups.map((group) => {
               const isCollapsed = collapsed.has(group.title);
+              const regionId = `log-group-${group.title.replace(/\s+/g, "-")}`;
               return (
                 <div
                   key={group.title}
@@ -267,12 +270,20 @@ export default function LogsTab({ jobID, jobStatus }) {
                   <button
                     type="button"
                     onClick={() => toggleGroup(group.title)}
+                    aria-expanded={!isCollapsed}
+                    aria-controls={regionId}
                     className="flex w-full items-center gap-2 bg-background px-3 py-2 text-left transition-colors hover:bg-accent"
                   >
                     {isCollapsed ? (
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                      <ChevronRight
+                        className="h-4 w-4 text-muted-foreground"
+                        aria-hidden="true"
+                      />
                     ) : (
-                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                      <ChevronDown
+                        className="h-4 w-4 text-muted-foreground"
+                        aria-hidden="true"
+                      />
                     )}
                     <span className="font-semibold">{group.title}</span>
                     <span className="text-muted-foreground">
@@ -280,7 +291,7 @@ export default function LogsTab({ jobID, jobStatus }) {
                     </span>
                   </button>
                   {!isCollapsed ? (
-                    <div className="space-y-0.5 p-2">
+                    <div id={regionId} className="space-y-0.5 p-2">
                       {group.logs.map((log, i) => (
                         <LogLine key={i} entry={log} />
                       ))}

@@ -4,7 +4,7 @@ export default function ProcessInfoCard({ process: p }) {
     <div className="rounded-lg border bg-card p-4">
       <div className="mb-2 flex items-start justify-between gap-4">
         <div>
-          <h3 className="font-semibold">{p.title || p.id}</h3>
+          <h2 className="font-semibold">{p.title || p.id}</h2>
           {p.description ? (
             <p className="mt-1 text-sm text-muted-foreground">
               {p.description}

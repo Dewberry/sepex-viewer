@@ -46,10 +46,26 @@ function ChartTooltip({ active, payload, label }) {
   );
 }
 
+function buildChartSummary(data) {
+  if (!data || data.length === 0) return "No data.";
+  const totals = STACKS.reduce((acc, s) => {
+    acc[s.key] = data.reduce((sum, d) => sum + (d[s.key] || 0), 0);
+    return acc;
+  }, {});
+  const grand = STACKS.reduce((sum, s) => sum + totals[s.key], 0);
+  const parts = STACKS.map((s) => `${totals[s.key]} ${s.label.toLowerCase()}`);
+  return `${grand} jobs over ${data.length} buckets — ${parts.join(", ")}.`;
+}
+
 export default function JobsOverTimeChart({ data, isLoading, isError }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <h3 className="mb-4 font-semibold">Jobs Over Time</h3>
+    <section
+      className="rounded-lg border border-border bg-card p-4"
+      aria-labelledby="jobs-over-time-heading"
+    >
+      <h2 id="jobs-over-time-heading" className="mb-4 font-semibold">
+        Jobs Over Time
+      </h2>
       {isLoading ? (
         <Skeleton className="h-64 w-full rounded-md" />
       ) : isError ? (
@@ -62,7 +78,11 @@ export default function JobsOverTimeChart({ data, isLoading, isError }) {
         </div>
       ) : (
         <>
-          <div className="h-64 w-full">
+          <div
+            role="img"
+            aria-label={`Jobs over time stacked area chart. ${buildChartSummary(data)}`}
+            className="h-64 w-full"
+          >
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={data}
@@ -139,6 +159,6 @@ export default function JobsOverTimeChart({ data, isLoading, isError }) {
           </div>
         </>
       )}
-    </div>
+    </section>
   );
 }

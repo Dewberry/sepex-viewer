@@ -181,9 +181,9 @@ export default function BuilderPage() {
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
             <LayoutGrid className="h-8 w-8 text-muted-foreground" />
           </div>
-          <h3 className="mb-2 text-lg font-semibold">
+          <h2 className="mb-2 text-lg font-semibold">
             Select a process to begin
-          </h3>
+          </h2>
           <p className="max-w-md text-sm text-muted-foreground">
             Choose a registered OGC Process from the dropdown above to build and
             submit an execution payload.

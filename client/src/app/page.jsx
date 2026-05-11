@@ -64,10 +64,15 @@ function SparklineCard() {
         </div>
         <div className="text-xs text-status-successful">+12%</div>
       </div>
-      <div className="flex h-12 items-end gap-0.5">
+      <div
+        role="img"
+        aria-label={`Jobs completed over the last 24 hours, trending up 12 percent. Hourly counts: ${SPARK_BARS.join(", ")}.`}
+        className="flex h-12 items-end gap-0.5"
+      >
         {SPARK_BARS.map((value, i) => (
           <div
             key={i}
+            aria-hidden="true"
             className="flex-1 rounded-sm bg-dewberry-teal"
             style={{ height: `${(value / SPARK_MAX) * 100}%` }}
           />
@@ -193,7 +198,7 @@ export default function LandingPage() {
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-status-successful/20">
                 <PlayCircle className="h-6 w-6 text-status-successful" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold">Submit jobs</h3>
+              <h2 className="mb-2 text-lg font-semibold">Submit jobs</h2>
               <p className="text-sm text-muted-foreground">
                 Pick any registered process, fill in inputs from the
                 auto-generated form, execute sync or async.
@@ -204,7 +209,7 @@ export default function LandingPage() {
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-status-running/20">
                 <Activity className="h-6 w-6 text-status-running" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold">Watch them run</h3>
+              <h2 className="mb-2 text-lg font-semibold">Watch them run</h2>
               <p className="text-sm text-muted-foreground">
                 Live status and streaming process logs from whatever execution
                 backend you&rsquo;ve configured.
@@ -215,7 +220,7 @@ export default function LandingPage() {
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-dewberry-teal/20">
                 <Terminal className="h-6 w-6 text-dewberry-teal" />
               </div>
-              <h3 className="mb-2 text-lg font-semibold">Audit results</h3>
+              <h2 className="mb-2 text-lg font-semibold">Audit results</h2>
               <p className="text-sm text-muted-foreground">
                 Logs, metadata, and download links to result files — every job
                 addressable by URL.

@@ -49,8 +49,11 @@ export default function SaveTemplateDialog({ open, onOpenChange, onSave }) {
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
-          <label className="block text-sm font-medium">Template name</label>
+          <label htmlFor="template-name" className="block text-sm font-medium">
+            Template name
+          </label>
           <Input
+            id="template-name"
             value={name}
             onChange={(e) => {
               setName(e.target.value);
@@ -64,8 +67,14 @@ export default function SaveTemplateDialog({ open, onOpenChange, onSave }) {
             }}
             placeholder="e.g. Weekly Baseline"
             autoFocus
+            aria-invalid={!!error}
+            aria-describedby={error ? "template-name-error" : undefined}
           />
-          {error && <p className="text-xs text-status-failed">{error}</p>}
+          {error && (
+            <p id="template-name-error" className="text-xs text-status-failed">
+              {error}
+            </p>
+          )}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => handleOpenChange(false)}>

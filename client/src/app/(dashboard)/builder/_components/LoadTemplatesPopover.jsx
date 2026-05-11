@@ -34,7 +34,7 @@ export default function LoadTemplatesPopover({
       <PopoverContent align="end" className="w-[360px] p-0">
         <div className="border-b px-4 py-3">
           <div className="mb-1 flex items-center justify-between">
-            <h3 className="font-semibold">Saved templates</h3>
+            <h2 className="font-semibold">Saved templates</h2>
             <Button
               variant="ghost"
               size="icon"

@@ -14,8 +14,13 @@ export default function RecentActivityFeed({
   limit = 8
 }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <h3 className="mb-4 font-semibold">Recent Activity</h3>
+    <section
+      className="rounded-lg border border-border bg-card p-4"
+      aria-labelledby="recent-activity-heading"
+    >
+      <h2 id="recent-activity-heading" className="mb-4 font-semibold">
+        Recent Activity
+      </h2>
 
       {isLoading ? (
         <div className="space-y-2">
@@ -69,9 +74,9 @@ export default function RecentActivityFeed({
       <Button asChild variant="ghost" size="sm" className="mt-3 w-full">
         <Link href="/jobs">
           View all jobs
-          <ArrowRight className="ml-1 h-3 w-3" />
+          <ArrowRight className="ml-1 h-3 w-3" aria-hidden="true" />
         </Link>
       </Button>
-    </div>
+    </section>
   );
 }

@@ -41,10 +41,13 @@ export default function FailedJobsAlert({ jobs, isLoading, isError }) {
   return (
     <div className="rounded-lg border border-status-failed/30 bg-status-failed/5 p-4">
       <div className="mb-3 flex items-center gap-2">
-        <AlertTriangle className="h-5 w-5 text-status-failed" />
-        <h3 className="font-semibold text-status-failed">
+        <AlertTriangle
+          className="h-5 w-5 text-status-failed"
+          aria-hidden="true"
+        />
+        <h2 className="font-semibold text-status-failed">
           {jobs.length} Failed {jobs.length === 1 ? "Job" : "Jobs"}
-        </h3>
+        </h2>
       </div>
 
       <div className="space-y-2">

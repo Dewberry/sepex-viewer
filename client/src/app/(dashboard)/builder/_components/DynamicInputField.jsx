@@ -13,15 +13,21 @@ export default function DynamicInputField({
   const dataType = input.input?.literalDataDomain?.dataType;
   const valueDef = input.input?.literalDataDomain?.valueDefinition || {};
   const required = (input.minOccurs || 0) > 0;
+  const fieldId = `field-${input.id}`;
+  const descriptionId = input.description ? `${fieldId}-desc` : undefined;
 
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium">
+      <label htmlFor={fieldId} className="mb-1.5 block text-sm font-medium">
         {input.title || input.id}
-        {required && <span className="ml-1 text-status-failed">*</span>}
+        {required && (
+          <span className="ml-1 text-status-failed" aria-hidden="true">
+            *
+          </span>
+        )}
       </label>
       {input.description && (
-        <p className="mb-2 text-xs text-muted-foreground">
+        <p id={descriptionId} className="mb-2 text-xs text-muted-foreground">
           {input.description}
         </p>
       )}
@@ -34,9 +40,12 @@ export default function DynamicInputField({
             return (
               <Input
                 {...field}
+                id={fieldId}
                 value={field.value ?? ""}
                 placeholder={`Enter ${(input.title || input.id).toLowerCase()}…`}
                 className="font-mono"
+                aria-required={required || undefined}
+                aria-describedby={descriptionId}
               />
             );
           }
@@ -44,6 +53,7 @@ export default function DynamicInputField({
             if (Array.isArray(valueDef.possibleValues)) {
               return (
                 <select
+                  id={fieldId}
                   value={field.value ?? ""}
                   onChange={(e) =>
                     field.onChange(
@@ -51,6 +61,8 @@ export default function DynamicInputField({
                     )
                   }
                   onBlur={field.onBlur}
+                  aria-required={required || undefined}
+                  aria-describedby={descriptionId}
                   className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   <option value="">Select…</option>
@@ -64,6 +76,7 @@ export default function DynamicInputField({
             }
             return (
               <Input
+                id={fieldId}
                 type="number"
                 value={field.value ?? ""}
                 onChange={(e) =>
@@ -73,6 +86,8 @@ export default function DynamicInputField({
                 }
                 onBlur={field.onBlur}
                 placeholder="Enter integer…"
+                aria-required={required || undefined}
+                aria-describedby={descriptionId}
               />
             );
           }
@@ -82,6 +97,7 @@ export default function DynamicInputField({
             (field.value ? JSON.stringify(field.value, null, 2) : "");
           return (
             <Textarea
+              id={fieldId}
               rows={4}
               value={raw}
               onChange={(e) => {
@@ -104,6 +120,8 @@ export default function DynamicInputField({
                   : '[ "item1", "item2" ]'
               }
               className="font-mono"
+              aria-required={required || undefined}
+              aria-describedby={descriptionId}
             />
           );
         }}

@@ -7,8 +7,13 @@ export default function TopSubmittersChart({ data, isLoading, isError }) {
   const total = data?.reduce((sum, e) => sum + e.count, 0) || 0;
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <h3 className="mb-4 font-semibold">Top Submitters</h3>
+    <section
+      className="rounded-lg border border-border bg-card p-4"
+      aria-labelledby="top-submitters-heading"
+    >
+      <h2 id="top-submitters-heading" className="mb-4 font-semibold">
+        Top Submitters
+      </h2>
       {isLoading ? (
         <Skeleton className="h-64 w-full rounded-md" />
       ) : isError ? (
@@ -39,7 +44,10 @@ export default function TopSubmittersChart({ data, isLoading, isError }) {
                   </span>
                   <span className="font-semibold">{entry.count}</span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-muted">
+                <div
+                  aria-hidden="true"
+                  className="h-2 overflow-hidden rounded-full bg-muted"
+                >
                   <div
                     className="h-full rounded-full bg-status-successful transition-all"
                     style={{ width: `${pct}%` }}
@@ -50,6 +58,6 @@ export default function TopSubmittersChart({ data, isLoading, isError }) {
           })}
         </div>
       )}
-    </div>
+    </section>
   );
 }
